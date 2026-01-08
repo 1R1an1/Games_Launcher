@@ -84,6 +84,8 @@
     <Compile Include="Core\GameFunctions.cs" />
     <Compile Include="Core\GameMonitor.cs" />
     <Compile Include="Core\GamesInfo.cs" />
+    <Compile Include="Infraestructure\SingleInstanceManager.cs" />
+    <Compile Include="Infraestructure\WindowController.cs" />
     <Compile Include="Model\AppModel.cs" />
     <Compile Include="Views\ConfigView.xaml.cs">
       <DependentUpon>ConfigView.xaml</DependentUpon>

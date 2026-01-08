@@ -1,7 +1,7 @@
 ﻿using FortiCrypts;
 using Games_Launcher.Core;
-using System.Linq;
-using System.Threading;
+using Games_Launcher.Infraestructure;
+using System.Linq; 
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -15,24 +15,13 @@ namespace Games_Launcher
         public static MainWindow window;
         private bool EnableAutoSave = false;
 
-		private static Mutex _mutex;
-		private static EventWaitHandle _showEvent;
-
-		private const string MutexName = "GamesLauncher_SingleInstance";
-		private const string ShowEventName = "GamesLauncher_ShowWindow";
+		private SingleInstanceManager _instance;
+		private WindowController _windowController;
 
 		protected override void OnStartup(StartupEventArgs e)
         {
-			bool createdNew;
-			_mutex = new Mutex(true, MutexName, out createdNew);
-
-			if (!createdNew)
-			{
-				NotifyInstance();
-				Shutdown();
-				return;
-			}
-
+            _instance = new SingleInstanceManager("GamesLauncher_SingleInstance", "GamesLauncher_ShowWindow", out bool i);
+            if (i) return;
 
 			base.OnStartup(e);
             CryptoUtils.iterations = 2500;
@@ -50,8 +39,9 @@ namespace Games_Launcher
             });
 
             window = new MainWindow();
-            if (e.Args.Contains("-background"))
-                Ocultar();
+			_windowController = new WindowController(window);
+			if (e.Args.Contains("-background"))
+                _windowController.Hide();
             else
                 window.Show();
 
@@ -61,49 +51,8 @@ namespace Games_Launcher
             GameMonitor.StartLoop();
             EnableAutoSave = true;
 
-            CreateListener();
-
-            //reference windoww = new reference();
-            ////MainWindow = windoww;
-            //windoww.Show();
+			_instance.Listen(_windowController.Show);
         }
-
-        private void CreateListener()
-        {
-            _showEvent = new EventWaitHandle(false, EventResetMode.AutoReset, ShowEventName);
-
-			Task.Run(() =>
-			{
-				while (true)
-				{
-					_showEvent.WaitOne();
-                    Mostrar();
-				}
-			});
-		}
-        private void NotifyInstance()
-        {
-			EventWaitHandle.OpenExisting(ShowEventName).Set();
-		}
-
-        private void Mostrar()
-        {
-			Dispatcher.Invoke(() =>
-			{
-				window.ShowInTaskbar = true;
-				window.Visibility = Visibility.Visible;
-				window.WindowState = WindowState.Normal;
-				window.Activate();
-			});
-		}
-
-        private void Ocultar()
-        {
-			window.ShowInTaskbar = false;
-			window.WindowState = WindowState.Minimized;
-			window.Visibility = Visibility.Hidden;
-            window.Hide();
-		}
 
 		private void Current_Exit(object sender, ExitEventArgs e)
         {
