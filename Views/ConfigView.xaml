@@ -7,6 +7,14 @@
              mc:Ignorable="d" 
              Height="399" Width="330">
     <Grid>
-            
-    </Grid>
+		<StackPanel Orientation="Vertical" Margin="0,10"
+					HorizontalAlignment="Center">
+			<Label Style="{StaticResource lblSNTNBG}"
+				   Content="Iniciar con windows"
+				   Margin="0,0,0,7.5"
+				   FontSize="14"
+				   Foreground="#aaa"/>
+			<CheckBox x:Name="CBStartWindows" Style="{StaticResource checkBox}" Unchecked="CBStartWindows_Unchecked" Checked="CBStartWindows_Checked"/>
+		</StackPanel>
+	</Grid>
 </UserControl>

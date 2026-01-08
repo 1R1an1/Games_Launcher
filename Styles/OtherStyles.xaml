@@ -101,4 +101,79 @@
             </Setter.Value>
         </Setter>
     </Style>
+	<Style x:Key="checkBox" TargetType="CheckBox">
+		<Setter Property="HorizontalAlignment" Value="Center"/>
+		<Setter Property="VerticalAlignment" Value="Center"/>
+		<Setter Property="Template">
+			<Setter.Value>
+				<ControlTemplate TargetType="CheckBox">
+
+					<StackPanel VerticalAlignment="Center">
+						<Grid>
+							<Border Width="52" Height="22" x:Name="bord"
+								Background="{StaticResource Background}"
+								CornerRadius="10" BorderThickness="2" BorderBrush="Gray"
+								Margin="5,0"/>
+
+							<Border x:Name="button"
+								Height="12.5" Width="12.5" Margin="10,0,0,0"
+								CornerRadius="12.5" Background="Gray"
+								HorizontalAlignment="Left"/>
+
+							<ContentPresenter x:Name="content"
+										  Margin="10,0,0,0"
+										  Content="{TemplateBinding Content}"
+										  VerticalAlignment="Center"/>
+						</Grid>
+					</StackPanel>
+
+					<ControlTemplate.Resources>
+						<Storyboard x:Key="right">
+							<ThicknessAnimation Storyboard.TargetProperty="Margin"
+											Storyboard.TargetName="button"
+											Duration="0:0:0:.5"
+											From="10,0,0,0"
+											To="40,0,0,0">
+								<ThicknessAnimation.EasingFunction>
+									<CircleEase EasingMode="EaseOut"/>
+								</ThicknessAnimation.EasingFunction>
+							</ThicknessAnimation>
+						</Storyboard>
+
+						<Storyboard x:Key="left">
+							<ThicknessAnimation Storyboard.TargetProperty="Margin"
+											Storyboard.TargetName="button"
+											Duration="0:0:0:.5"
+											From="40,0,0,0"
+											To="10,0,0,0">
+								<ThicknessAnimation.EasingFunction>
+									<CircleEase EasingMode="EaseOut"/>
+								</ThicknessAnimation.EasingFunction>
+							</ThicknessAnimation>
+						</Storyboard>
+					</ControlTemplate.Resources>
+
+					<ControlTemplate.Triggers>
+						<Trigger Property="IsChecked" Value="False">
+							<Trigger.ExitActions>
+								<RemoveStoryboard BeginStoryboardName="leftt"/>
+								<BeginStoryboard Storyboard="{StaticResource right}" x:Name="rightt"/>
+							</Trigger.ExitActions>
+
+							<Setter TargetName="bord" Property="Background" Value="#404040"/>
+						</Trigger>
+
+						<Trigger Property="IsChecked" Value="True">
+							<Trigger.ExitActions>
+								<RemoveStoryboard BeginStoryboardName="rightt"/>
+								<BeginStoryboard Storyboard="{StaticResource left}" x:Name="leftt"/>
+							</Trigger.ExitActions>
+
+							<Setter TargetName="bord" Property="Background" Value="#C5C5C5"/>
+						</Trigger>
+					</ControlTemplate.Triggers>
+				</ControlTemplate>
+			</Setter.Value>
+		</Setter>
+	</Style>
 </ResourceDictionary>
