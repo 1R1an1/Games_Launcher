@@ -62,7 +62,7 @@ namespace Games_Launcher
             GameMonitor.StartLoop();
             EnableAutoSave = true;
 
-			_instance.Listen(_windowController.Show);
+			_instance.Listen(Show);
         }
 
         public static void Show() { _windowController.Show(); _notifyIcon.HideNIcon(); }

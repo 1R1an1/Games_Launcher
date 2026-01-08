@@ -68,7 +68,7 @@ namespace Games_Launcher.Views
 
         private void BTNOpenFolder_Click(object sender, RoutedEventArgs e)
         {
-            Process.Start("explorer.exe", Path.GetFullPath("./"));
+            Process.Start("explorer.exe", AppDomain.CurrentDomain.BaseDirectory);
         }
 
         private void BTNFileDownloader_Click(object sender, RoutedEventArgs e)

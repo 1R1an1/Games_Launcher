@@ -12,9 +12,10 @@ namespace Games_Launcher.Core
 {
     public static class GamesInfo
     {
-        public readonly static string GAMESDATAFILE = "./games_data.dat";
-        public readonly static string GAMESDATAFILEOLD = "./games_data_OLD.dat";
-        public readonly static string GAMESDATAFILECRASH = "./games_data_CRASH.json";
+		public static readonly string APP_DIR = AppDomain.CurrentDomain.BaseDirectory;
+		public readonly static string GAMESDATAFILE = Path.Combine(APP_DIR, "games_data.dat");
+        public readonly static string GAMESDATAFILEOLD = Path.Combine(APP_DIR, "games_data_OLD.dat");
+        public readonly static string GAMESDATAFILECRASH = Path.Combine(APP_DIR, "games_data_CRASH.json");
         public const int CURRENTDATAVERSION = 3;
 
         private static AppModel _appData;
