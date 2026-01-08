@@ -41,6 +41,16 @@
                     Click="BTNFileDownloader_Click">
                 <Image Source="/Img/downloadIMG.png" Width="30" Height="27"/>
             </Button>
-        </StackPanel>
+
+			<Button x:Name="BTNConfig"
+                    Style="{StaticResource ButtonStyle}"
+                    FontSize="22"
+                    Margin="5,0,0,0"
+                    Padding="4.5,4.1"
+                    ToolTip="Abre la configuracion de la aplicacio"
+					Content="⚙"
+                    Click="BTNConfig_Click"/>
+
+		</StackPanel>
     </Grid>
 </UserControl>

@@ -75,5 +75,11 @@ namespace Games_Launcher.Views
         {
             new FileDownloaderWindow().Show();
         }
-    }
+
+        private void BTNConfig_Click(object sender, RoutedEventArgs e)
+        {
+            var configWindow = new ConfigWindow();
+            configWindow.ShowDialog();
+		}
+	}
 }

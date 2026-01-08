@@ -85,8 +85,14 @@
     <Compile Include="Core\GameMonitor.cs" />
     <Compile Include="Core\GamesInfo.cs" />
     <Compile Include="Model\AppModel.cs" />
+    <Compile Include="Views\ConfigView.xaml.cs">
+      <DependentUpon>ConfigView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\ConfigGameWindow.xaml.cs">
       <DependentUpon>ConfigGameWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Windows\ConfigWindow.xaml.cs">
+      <DependentUpon>ConfigWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Windows\FileDownloaderWindow.xaml.cs">
       <DependentUpon>FileDownloaderWindow.xaml</DependentUpon>
@@ -105,9 +111,17 @@
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
+    <Page Include="Views\ConfigView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\ConfigGameWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\ConfigWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Windows\FileDownloaderWindow.xaml">
       <SubType>Designer</SubType>
@@ -188,7 +202,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Core\FortiCryptBC.xml" />
-    <Resource Include="Template new window.txt" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Img\iconOld.ico" />
