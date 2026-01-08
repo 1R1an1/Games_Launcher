@@ -1,6 +1,7 @@
 ﻿using FortiCrypts;
 using Games_Launcher.Core;
 using Games_Launcher.Infraestructure;
+using System;
 using System.Linq; 
 using System.Threading.Tasks;
 using System.Windows;
@@ -16,14 +17,15 @@ namespace Games_Launcher
         private bool EnableAutoSave = false;
 
 		private SingleInstanceManager _instance;
-		private WindowController _windowController;
+		private static WindowController _windowController;
+        private static NotifyIconController _notifyIcon;
 
-		protected override void OnStartup(StartupEventArgs e)
+        protected override void OnStartup(StartupEventArgs e)
         {
             _instance = new SingleInstanceManager("GamesLauncher_SingleInstance", "GamesLauncher_ShowWindow", out bool i);
             if (i) return;
 
-			base.OnStartup(e);
+            base.OnStartup(e);
             CryptoUtils.iterations = 2500;
             GamesInfo.CheckFileNames();
             GamesInfo.LoadGamesData();
@@ -39,11 +41,20 @@ namespace Games_Launcher
             });
 
             window = new MainWindow();
-			_windowController = new WindowController(window);
-			if (e.Args.Contains("-background"))
-                _windowController.Hide();
+            _windowController = new WindowController(window);
+
+            _notifyIcon = new NotifyIconController();
+            _notifyIcon.ShowRequested += () => Show();
+			_notifyIcon.ExitRequested += Shutdown;
+
+
+			if (e.Args.Any(a => a.Equals("-background", StringComparison.OrdinalIgnoreCase)))
+                Hide();
             else
+            {
                 window.Show();
+                _notifyIcon.HideNIcon();
+            }
 
             MainWindow = window;
             App.Current.Exit += Current_Exit;
@@ -54,10 +65,14 @@ namespace Games_Launcher
 			_instance.Listen(_windowController.Show);
         }
 
+        public static void Show() { _windowController.Show(); _notifyIcon.HideNIcon(); }
+        public static void Hide() { _windowController.Hide(); _notifyIcon.ShowNIcon(); }
+
 		private void Current_Exit(object sender, ExitEventArgs e)
         {
             window.InvokeEvent();
             GamesInfo.SaveGamesData();
+            _notifyIcon.Dispose();
         }
     }
 }

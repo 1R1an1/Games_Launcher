@@ -30,7 +30,7 @@ namespace Games_Launcher
 
         private void b_minimizar_Click(object sender, RoutedEventArgs e)
         {
-            WindowState = WindowState.Minimized;
+            App.Hide();
         }
     }
 }

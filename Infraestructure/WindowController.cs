@@ -2,8 +2,8 @@
 
 namespace Games_Launcher.Infraestructure
 {
-    public class WindowController
-    {
+	public class WindowController
+	{
 		private readonly Window _window;
 
 		public WindowController(Window window)
@@ -15,19 +15,28 @@ namespace Games_Launcher.Infraestructure
 		{
 			_window.Dispatcher.Invoke(() =>
 			{
+				if (!_window.IsVisible)
+					_window.Show();
+
 				_window.ShowInTaskbar = true;
-				_window.Visibility = Visibility.Visible;
+				
 				_window.WindowState = WindowState.Normal;
+				_window.UpdateLayout();
+				_window.InvalidateVisual();
+
+				_window.Topmost = true;
 				_window.Activate();
+				_window.Topmost = false;
 			});
 		}
 
 		public void Hide()
 		{
-			_window.ShowInTaskbar = false;
-			_window.WindowState = WindowState.Minimized;
-			_window.Visibility = Visibility.Hidden;
-			_window.Hide();
+			_window.Dispatcher.Invoke(() =>
+			{
+				_window.ShowInTaskbar = false;
+				_window.Hide();
+			});
 		}
 	}
 }
