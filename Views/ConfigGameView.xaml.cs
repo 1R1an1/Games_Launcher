@@ -2,10 +2,9 @@
 using Games_Launcher.Model;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -71,25 +70,25 @@ namespace Games_Launcher.Views
             Process.Start("explorer.exe", Path.GetDirectoryName(_thisGame.Path));
         }
 
-        private async void MoverBTN_Click(object sender, RoutedEventArgs e)
-        {
-            if (MessageBox.Show(Window.GetWindow(this), "¿Estas seguro que deseas mover el juego de carpeta? \nSolo se moveran los archivos del juego a otra carpeta, nada mas.", "ADVERTENCIA", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
-                return;
+		private async void MoverBTN_Click(object sender, RoutedEventArgs e)
+		{
+			if (MessageBox.Show(Window.GetWindow(this), "¿Estas seguro que deseas mover el juego de carpeta? \nSolo se moveran los archivos del juego a otra carpeta, nada mas.", "ADVERTENCIA", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+				return;
 
-            MessageBox.Show(Window.GetWindow(this), "Es necesario que selecciones la carpeta donde se almacena el juego.", "Mover juego", MessageBoxButton.OK, MessageBoxImage.Information);
-            string gamePath = SeleccionarCarpeta("Carpeta del juego");
+			MessageBox.Show(Window.GetWindow(this), "Es necesario que selecciones la carpeta donde se almacena el juego.", "Mover juego", MessageBoxButton.OK, MessageBoxImage.Information);
+			string gamePath = SeleccionarCarpeta("Carpeta del juego");
 			if (gamePath == null) return;
 
-            MessageBox.Show(Window.GetWindow(this), "Ahora selecciona la carpeta a donde quieres que se mueva el juego.", "Mover juego", MessageBoxButton.OK, MessageBoxImage.Information);
-            string gameMovePath;
+			MessageBox.Show(Window.GetWindow(this), "Ahora selecciona la carpeta a donde quieres que se mueva el juego.", "Mover juego", MessageBoxButton.OK, MessageBoxImage.Information);
+			string gameMovePath;
 			while (true)
-            {
-                gameMovePath = SeleccionarCarpeta("Carpeta para mover al juego");
+			{
+				gameMovePath = SeleccionarCarpeta("Carpeta para mover al juego");
 				if (gameMovePath == null) return;
-                if (VerificarCarpetas(gamePath, gameMovePath))
-                    MessageBox.Show(Window.GetWindow(this), "La carpeta destino no puede estar dentro de la carpeta del juego ni ser la misma.", "Mover juego", MessageBoxButton.OK, MessageBoxImage.Information);
-                else
-                    break;
+				if (VerificarCarpetas(gamePath, gameMovePath))
+					MessageBox.Show(Window.GetWindow(this), "La carpeta destino no puede estar dentro de la carpeta del juego ni ser la misma.", "Mover juego", MessageBoxButton.OK, MessageBoxImage.Information);
+				else
+					break;
 			}
 
 			Window.GetWindow(this).Focus();
@@ -98,94 +97,51 @@ namespace Games_Launcher.Views
 			SetEnabledControl(MoverBTN, false);
 			isMoving = true;
 
-            bprgbr.Visibility = Visibility.Visible;
-            prgbr.IsIndeterminate = true;
-
-			long tamañoTotal = 0;
-			long movidos = 0;
-
-			// Crear una lista de archivos en paralelo, pero mover mientras se agregan
-			var archivos = new ConcurrentQueue<string>();
-
-			// Tarea que va descubriendo archivos y sumando tamaños
-			var producer = Task.Run(() =>
-			{
-				foreach (var archivo in Directory.GetFiles(gamePath, "*", SearchOption.AllDirectories))
-				{
-					archivos.Enqueue(archivo);
-					try
-					{
-						tamañoTotal += new FileInfo(archivo).Length;
-					}
-					catch { }
-				}
-			});
+			bprgbr.Visibility = Visibility.Visible;
+			prgbr.IsIndeterminate = true;
 
 			string nombreCarpetaOrigen = new DirectoryInfo(gamePath).Name;
 
 			// Detectar si el destino ya termina con el nombre de la carpeta
 			string destinoFinal;
 			if (Path.GetFileName(gameMovePath.TrimEnd(Path.DirectorySeparatorChar)) == nombreCarpetaOrigen)
-			{
-				// El destino ya incluye la carpeta origen, no agregamos nada
 				destinoFinal = gameMovePath;
-			}
 			else
-			{
-				// El destino no incluye la carpeta origen, la añadimos
 				destinoFinal = Path.Combine(gameMovePath, nombreCarpetaOrigen);
-			}
-			// Tarea que va moviendo archivos mientras se descubren
-			var consumer = Task.Run(() =>
+
+			var archivos = await Task.Run(() => Directory.GetFiles(gamePath, "*", SearchOption.AllDirectories));
+			var totalArchivos = archivos.Length;
+			int movidos = 0;
+
+			prgbr.IsIndeterminate = false;
+			prgbr.Minimum = 0;
+			prgbr.Maximum = totalArchivos;
+			prgbr.Value = 0;
+
+			// Mover archivos
+			await Task.Run(() =>
 			{
-				while (!producer.IsCompleted || archivos.Count > 0)
+				foreach (var archivo in archivos)
 				{
-					if (archivos.TryDequeue(out string archivo))
-					{
-						string destinoArchivo = archivo.Replace(gamePath, destinoFinal);
-						Directory.CreateDirectory(Path.GetDirectoryName(destinoArchivo));
-						File.Move(archivo, destinoArchivo);
+					string destinoArchivo = archivo.Replace(gamePath, destinoFinal);
+					Directory.CreateDirectory(Path.GetDirectoryName(destinoArchivo));
+					File.Move(archivo, destinoArchivo);
 
-						try
-						{
-							movidos += new FileInfo(destinoArchivo).Length;
-						}
-						catch { }
-
-						// Actualizar progressbar en UI
-						Application.Current.Dispatcher.Invoke(() =>
-						{
-							if (tamañoTotal > 0)
-							{
-								prgbr.IsIndeterminate = false;
-								prgbr.Maximum = tamañoTotal;
-								prgbr.Value = movidos;
-							}
-						});
-					}
-					else
+					movidos++;
+					Application.Current.Dispatcher.Invoke(() =>
 					{
-						Thread.Sleep(50); // esperar un poco si no hay archivos aún
-					}
+						prgbr.Value = movidos;
+					});
 				}
 			});
 
-			await Task.WhenAll(producer, consumer);
-
-			// Borrar carpetas vacías
-			var carpetas = Directory.GetDirectories(gamePath, "*", SearchOption.AllDirectories);
-
-			// Ordenar de la más profunda a la menos profunda
-			Array.Sort(carpetas, (a, b) => b.Length.CompareTo(a.Length));
-
-			foreach (var carpeta in carpetas)
+			foreach (var carpeta in Directory.GetDirectories(gamePath, "*", SearchOption.AllDirectories).OrderByDescending(c => c.Length))
 			{
 				try { Directory.Delete(carpeta, false); }
 				catch { }
 			}
+			try { Directory.Delete(gamePath, false); } catch { }
 
-			try { Directory.Delete(gamePath, false); }
-			catch { }
 
 			string carpetaJuegoOriginal = Path.GetFullPath(gamePath);
 			GamePathTBX.Text = _thisGame.Path.Replace(carpetaJuegoOriginal, destinoFinal);
@@ -195,7 +151,7 @@ namespace Games_Launcher.Views
 			isMoving = false;
 			bprgbr.Visibility = Visibility.Collapsed;
 		}
-
+		
 		private string SeleccionarCarpeta(string titulo)
 		{
 			while (true)
