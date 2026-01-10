@@ -10,10 +10,12 @@ namespace Games_Launcher.Windows
     /// </summary>
     public partial class ConfigGameWindow : Window
     {
+        private ConfigGameView CDU;
         public ConfigGameWindow(GameModel game, GameView gameView)
         {
             InitializeComponent();
-            aaaaaaaa.Children.Add(new ConfigGameView(game, gameView));
+            CDU = new ConfigGameView(game, gameView);
+			aaaaaaaa.Children.Add(CDU);
             borde1.Visibility = Visibility.Visible;
         }
 
@@ -24,7 +26,8 @@ namespace Games_Launcher.Windows
         }
         private void b_cerrar_Click(object sender, RoutedEventArgs e)
         {
-            Close();
+            if (!CDU.isMoving)
+                Close();
         }
         private void b_minimizar_Click(object sender, RoutedEventArgs e)
         {
