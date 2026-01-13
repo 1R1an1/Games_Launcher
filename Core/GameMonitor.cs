@@ -72,6 +72,7 @@ namespace Games_Launcher.Core
                             view.IsRunning = true;
                             view.thisGame.LastPlayed = DateTime.Now;
                             view.Dispatcher.Invoke(() => view.LBLLastOppend.Content = GameFunctions.UltimaVezJugado(view.thisGame.LastPlayed));
+                            App.Current.Dispatcher.Invoke(() => App.UpdateNIcons());
                         }
                         else if (!currentlyRunning && view.IsRunning)
                         {

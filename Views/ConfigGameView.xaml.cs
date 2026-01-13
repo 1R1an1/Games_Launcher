@@ -151,7 +151,6 @@ namespace Games_Launcher.Views
 			isMoving = false;
 			bprgbr.Visibility = Visibility.Collapsed;
 		}
-		
 		private string SeleccionarCarpeta(string titulo)
 		{
 			while (true)
@@ -177,7 +176,6 @@ namespace Games_Launcher.Views
 				}
 			}
 		}
-
 		private bool VerificarCarpetas(string padre, string hijo)
 		{
 			string rutaPadre = Path.GetFullPath(padre.Replace('/', Path.DirectorySeparatorChar))
@@ -187,7 +185,6 @@ namespace Games_Launcher.Views
 
 			return rutaHijo.StartsWith(rutaPadre, StringComparison.OrdinalIgnoreCase);
 		}
-
 		private void SetEnabledControl(Control element, bool SetEnabledValue)
 		{
 			if (!SetEnabledValue)

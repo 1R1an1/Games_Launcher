@@ -16,8 +16,8 @@ namespace Games_Launcher
         public static MainWindow window;
         private bool EnableAutoSave = false;
 
-		private SingleInstanceManager _instance;
-		private static WindowController _windowController;
+        private SingleInstanceManager _instance;
+        private static WindowController _windowController;
         private static NotifyIconController _notifyIcon;
 
         protected override void OnStartup(StartupEventArgs e)
@@ -45,10 +45,10 @@ namespace Games_Launcher
 
             _notifyIcon = new NotifyIconController();
             _notifyIcon.ShowRequested += () => Show();
-			_notifyIcon.ExitRequested += Shutdown;
+            _notifyIcon.ExitRequested += Shutdown;
 
 
-			if (e.Args.Any(a => a.Equals("-background", StringComparison.OrdinalIgnoreCase)))
+            if (e.Args.Any(a => a.Equals("-background", StringComparison.OrdinalIgnoreCase)))
                 Hide();
             else
             {
@@ -62,17 +62,19 @@ namespace Games_Launcher
             GameMonitor.StartLoop();
             EnableAutoSave = true;
 
-			_instance.Listen(Show);
+            _instance.Listen(Show);
         }
 
         public static void Show() { _windowController.Show(); _notifyIcon.HideNIcon(); }
         public static void Hide() { _windowController.Hide(); _notifyIcon.ShowNIcon(); }
 
-		private void Current_Exit(object sender, ExitEventArgs e)
+        private void Current_Exit(object sender, ExitEventArgs e)
         {
             window.InvokeEvent();
             GamesInfo.SaveGamesData();
             _notifyIcon.Dispose();
         }
+        public static void UpdateNIcons() => _notifyIcon.UpdateNICons();
+
     }
 }

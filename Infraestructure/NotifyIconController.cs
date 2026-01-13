@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Games_Launcher.Core;
+using Games_Launcher.Views;
+using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Games_Launcher.Infraestructure
@@ -21,12 +24,8 @@ namespace Games_Launcher.Infraestructure
 				Visible = true
 			};
 
-			var menu = new ContextMenuStrip();
-			menu.Items.Add("Abrir", null, (s, e) => ShowRequested?.Invoke());
-			menu.Items.Add("-");
-			menu.Items.Add("Salir", null, (s, e) => ExitRequested?.Invoke());
-
-			_icon.ContextMenuStrip = menu;
+			UpdateNICons();
+			
 			_icon.DoubleClick += (s, e) => ShowRequested?.Invoke();
 		}
 
@@ -38,5 +37,28 @@ namespace Games_Launcher.Infraestructure
 
 		public void HideNIcon() => _icon.Visible = false;
 		public void ShowNIcon() => _icon.Visible = true;
+		public void UpdateNICons()
+		{
+			var menu = new ContextMenuStrip();
+			foreach (var item in GamesInfo.Games.OrderByDescending(x => x.LastPlayed).Take(5).ToList())
+			{
+				menu.Items.Add(item.Name, Icon.ExtractAssociatedIcon(item.Path).ToBitmap(),
+					(s, e) =>
+					{
+						var index = GamesInfo.Games.IndexOf(item);
+						var gameView = App.window.CDU_Window.Juegos.Children[index] as GameView;
+						if (gameView != null)
+						{
+							gameView.BTNJugar_Click();
+						}
+					}
+				);
+			}
+			menu.Items.Add("-");
+			menu.Items.Add("Abrir", null, (s, e) => ShowRequested?.Invoke());
+			menu.Items.Add("Salir", null, (s, e) => ExitRequested?.Invoke());
+
+			_icon.ContextMenuStrip = menu;
+		}
 	}
 }

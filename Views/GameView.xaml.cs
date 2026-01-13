@@ -33,7 +33,7 @@ namespace Games_Launcher.Views
             InitializeComponent();
         }
 
-        private void BTNJugar_Click(object sender, RoutedEventArgs e)
+        public void BTNJugar_Click(object sender = null, RoutedEventArgs e = null)
         {
             if (!IsRunning)
             {
@@ -54,7 +54,7 @@ namespace Games_Launcher.Views
                     MessageBox.Show("No se pudo iniciar el juego. Verifica que la ruta y los parámetros sean correctos.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            else
+            else if (IsRunning && App.window.IsVisible)
                 foreach (var process in _gameProcess)
                     process.Kill();
                 
