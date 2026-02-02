@@ -33,7 +33,7 @@ namespace Games_Launcher.Views
             InitializeComponent();
         }
 
-        public void BTNJugar_Click(object sender = null, RoutedEventArgs e = null)
+        public void BTNJugar_Click(object sender = null, RoutedEventArgs ea = null)
         {
             if (!IsRunning)
             {
@@ -44,14 +44,14 @@ namespace Games_Launcher.Views
                         FileName = thisGame.Path,
                         Arguments = thisGame.Parameters,
                         UseShellExecute = false,
-                        WorkingDirectory = Path.GetDirectoryName(thisGame.Path)
+                        WorkingDirectory = Path.GetDirectoryName(thisGame.Path),
                     });
                     BTNJugar.IsEnabled = false;
                     BTNJugar.Tag = (Brush)FindResource("NormalColorNormal2");
                     BTNJugar.Foreground = (Brush)FindResource("FontColorDisabled2");
-                } catch
+                } catch (Exception e)
                 {
-                    MessageBox.Show("No se pudo iniciar el juego. Verifica que la ruta y los parámetros sean correctos.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show($"No se pudo iniciar el juego. Verifica que la ruta y los parámetros sean correctos.\n\nError: {e.Message} ({e.HResult})", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             else if (IsRunning && App.window.IsVisible)
