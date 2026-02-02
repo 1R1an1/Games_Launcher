@@ -44,7 +44,7 @@ namespace Games_Launcher
             _windowController = new WindowController(window);
 
             _notifyIcon = new NotifyIconController();
-            _notifyIcon.ShowRequested += () => Show();
+            _notifyIcon.ShowRequested += Show;
             _notifyIcon.ExitRequested += Shutdown;
 
 
