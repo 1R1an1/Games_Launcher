@@ -21,17 +21,14 @@ namespace Games_Launcher.Views
         public bool IsRunning = false;
         public DateTime starterTime = DateTime.Now;
 
-        public GameView(GameModel Game)
-        {
-            thisGame = Game;
-            InitializeComponent();
-            UpdateInfo();
-        }
-
         public GameView()
         {
             InitializeComponent();
-        }
+            DataContextChanged += (s, e) => { if (e.NewValue is GameModel game) { thisGame = game; UpdateInfo(); } };
+
+			Loaded += (_, __) => GameMonitor.Register(this);
+			Unloaded += (_, __) => GameMonitor.Unregister(this);
+		}
 
         public void BTNJugar_Click(object sender = null, RoutedEventArgs ea = null)
         {
@@ -49,7 +46,8 @@ namespace Games_Launcher.Views
                     BTNJugar.IsEnabled = false;
                     BTNJugar.Tag = (Brush)FindResource("NormalColorNormal2");
                     BTNJugar.Foreground = (Brush)FindResource("FontColorDisabled2");
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     MessageBox.Show($"No se pudo iniciar el juego. Verifica que la ruta y los parámetros sean correctos.\n\nError: {e.Message} ({e.HResult})", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
@@ -57,8 +55,8 @@ namespace Games_Launcher.Views
             else if (IsRunning && App.window.IsVisible)
                 foreach (var process in _gameProcess)
                     process.Kill();
-                
-            
+
+
         }
         private void BTNEliminar_Click(object sender, RoutedEventArgs e)
         {
@@ -66,15 +64,6 @@ namespace Games_Launcher.Views
                 return;
 
             GamesInfo.Games.Remove(thisGame);
-            GameMonitor.Unregister(this);
-            if (Parent is Panel panel)
-            {
-                panel.Children.Remove(this);
-            }
-            else if (Parent is ContentControl content)
-            {
-                content.Content = null;
-            }
         }
 
 
@@ -92,16 +81,10 @@ namespace Games_Launcher.Views
             window.ShowDialog();
         }
 
-        private void BTNUp_Click(object sender, RoutedEventArgs e)
-        {
-            GamesInfo.Games.Mover(GamesInfo.Games.IndexOf(thisGame), -1);
-        }
+        private void BTNUp_Click(object sender, RoutedEventArgs e) => GamesInfo.Games.Mover(GamesInfo.Games.IndexOf(thisGame), -1);
+        
 
-        private void BTNDown_Click(object sender, RoutedEventArgs e)
-        {
-            GamesInfo.Games.Mover(GamesInfo.Games.IndexOf(thisGame), +1);
-        }
-
+        private void BTNDown_Click(object sender, RoutedEventArgs e) => GamesInfo.Games.Mover(GamesInfo.Games.IndexOf(thisGame), +1);
         
     }
 

@@ -2,10 +2,8 @@
 using Games_Launcher.Model;
 using Games_Launcher.Windows;
 using System;
-using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -19,31 +17,6 @@ namespace Games_Launcher.Views
         public MainView()
         {
             InitializeComponent();
-            foreach (GameModel game in GamesInfo.Games)
-            {
-                CreateGame(game);
-            }
-            GamesInfo.Games.CollectionChanged += Games_CollectionChanged;
-        }
-
-        private void Games_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Move && e.OldItems.Count == 1)
-            {
-                GameModel game = (GameModel)e.OldItems[0];
-
-                // Buscar el GameView correspondiente en el panel usando DataContext
-                GameView element = Juegos.Children
-                                         .OfType<GameView>()
-                                         .FirstOrDefault(x => x.DataContext == game);
-
-                if (element != null)
-                {
-                    // Remover de la posición antigua y agregar en la nueva
-                    Juegos.Children.Remove(element);
-                    Juegos.Children.Insert(e.NewStartingIndex, element);
-                }
-            }
         }
 
         private void BTNAgregar_Click(object sender, RoutedEventArgs e)
@@ -59,12 +32,8 @@ namespace Games_Launcher.Views
                     PlayTime = new TimeSpan(0)
                 };
                 GamesInfo.Games.Add(newGame);
-                
-                CreateGame(GamesInfo.Games.Last());
             }
         }
-
-        private void CreateGame(GameModel game) { var gamee = new GameView(game) { Margin = new Thickness(5), DataContext = game }; Juegos.Children.Add(gamee); GameMonitor.Register(gamee); }
 
         private void BTNOpenFolder_Click(object sender, RoutedEventArgs e)
         {

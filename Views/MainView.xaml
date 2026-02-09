@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Games_Launcher.Views"
+			 xmlns:model="clr-namespace:Games_Launcher.Model"
+			 xmlns:core="clr-namespace:Games_Launcher.Core"
              mc:Ignorable="d" 
              d:DesignHeight="419" d:DesignWidth="750">
     <Grid>
@@ -16,8 +18,21 @@
                         <Setter Property="Template" Value="{StaticResource VerticalScrollBar}"/>
                     </Style>
                 </ScrollViewer.Resources>
-                <local:GridWrapPanel HorizontalAlignment="Center" Margin="10, 5" VerticalAlignment="Center" x:Name="Juegos"/>
-            </ScrollViewer>
+				<ItemsControl x:Name="GamesItemsControl" ItemsSource="{Binding Source={x:Static core:GamesInfo.Games}}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<local:GridWrapPanel HorizontalAlignment="Center" Margin="10, 5" VerticalAlignment="Center"/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+
+					<ItemsControl.ItemTemplate>
+						<DataTemplate DataType="{x:Type model:GameModel}">
+							<local:GameView Margin="5"/>
+						</DataTemplate>
+					</ItemsControl.ItemTemplate>
+				</ItemsControl>
+
+			</ScrollViewer>
         </Border>
         <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center"
                     Margin="20,0,20,17.5" Orientation="Horizontal">

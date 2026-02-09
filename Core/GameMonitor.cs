@@ -22,8 +22,9 @@ namespace Games_Launcher.Core
         {
             lock (_lock)
             {
-                _views.Add(view);
-            }
+				if (!_views.Contains(view))
+					_views.Add(view);
+			}
         }
 
         public static void Unregister(GameView view)
