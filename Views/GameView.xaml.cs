@@ -2,7 +2,6 @@
 using Games_Launcher.Model;
 using Games_Launcher.Windows;
 using System;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -86,23 +85,5 @@ namespace Games_Launcher.Views
 
         private void BTNDown_Click(object sender, RoutedEventArgs e) => GamesInfo.Games.Mover(GamesInfo.Games.IndexOf(thisGame), +1);
         
-    }
-
-    public static class ObservableCollectionExtensions
-    {
-        public static void Mover<T>(this ObservableCollection<T> list, int index, int direccion)
-        {
-            // direccion: -1 = subir, +1 = bajar
-            if (list == null || index < 0 || index >= list.Count)
-                return; // índice fuera de rango
-
-            int nuevoIndice = index + direccion;
-
-            if (nuevoIndice < 0 || nuevoIndice >= list.Count)
-                return; // no hacemos nada si se sale del rango
-
-            // Intercambiar elementos
-            list.Move(index, nuevoIndice);
-        }
     }
 }

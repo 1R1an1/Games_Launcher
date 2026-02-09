@@ -1,7 +1,12 @@
-﻿using Microsoft.Win32;
+﻿using Games_Launcher.Views;
+using Microsoft.Win32;
 using System;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.IO;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Games_Launcher.Core
@@ -75,5 +80,53 @@ namespace Games_Launcher.Core
             else
                 return CultureInfo.CurrentCulture.TextInfo.ToTitleCase(fechaInicio.ToString("dd MMM yyyy", new CultureInfo("es-ES")).Replace(".", ""));
         }
-    }
+
+		public static GameView GetGameViewFromItem(ItemsControl itemsControl, object item)
+		{
+			if (itemsControl == null || item == null)
+				return null;
+
+			var a = itemsControl.ItemContainerGenerator.ContainerFromItem(item) as ContentPresenter;
+
+            if (a != null)
+            {
+                return FindVisualChild<GameView>(a);
+            }
+            else return null;
+		}
+		private static T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+		{
+			for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+			{
+				var child = VisualTreeHelper.GetChild(parent, i);
+
+				if (child is T typedChild)
+					return typedChild;
+
+				var result = FindVisualChild<T>(child);
+				if (result != null)
+					return result;
+			}
+			return null;
+		}
+
+	}
+
+	public static class ObservableCollectionExtensions
+	{
+		public static void Mover<T>(this ObservableCollection<T> list, int index, int direccion)
+		{
+			// direccion: -1 = subir, +1 = bajar
+			if (list == null || index < 0 || index >= list.Count)
+				return; // índice fuera de rango
+
+			int nuevoIndice = index + direccion;
+
+			if (nuevoIndice < 0 || nuevoIndice >= list.Count)
+				return; // no hacemos nada si se sale del rango
+
+			// Intercambiar elementos
+			list.Move(index, nuevoIndice);
+		}
+	}
 }

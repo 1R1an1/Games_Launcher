@@ -1,5 +1,4 @@
 ﻿using Games_Launcher.Core;
-using Games_Launcher.Views;
 using Games_Launcher.Windows;
 using System;
 using System.Diagnostics;
@@ -47,8 +46,7 @@ namespace Games_Launcher.Infraestructure
 				menu.Items.Add(item.Name, Try(() => Icon.ExtractAssociatedIcon(item.Path)?.ToBitmap()) ?? new Bitmap(App.GetResourceStream(new Uri("pack://application:,,,/Img/ErrorImg.png")).Stream),
 					(s, e) =>
 					{
-						var index = GamesInfo.Games.IndexOf(item);
-						var gameView = App.window.CDU_Window.Juegos.Children[index] as GameView;
+						var gameView = GameFunctions.GetGameViewFromItem(App.window.CDU_Window.GamesItemsControl, item);
 						if (gameView != null)
 						{
 							gameView.BTNJugar_Click();
