@@ -17,24 +17,15 @@ namespace Games_Launcher.Views
     /// </summary>
     public partial class ConfigGameView : UserControl
     {
-        private GameModel _thisGame;
-        private GameView _thisGameView;
+        private GameModel _thisGame => (GameModel)DataContext;
         public bool isMoving;
 
-        public ConfigGameView(GameModel game, GameView gameView)
+        public ConfigGameView()
         {
-            _thisGame = game;
-            _thisGameView = gameView;
             InitializeComponent();
-            Init();
-        }
+		}
 
-        private void Init()
-        {
-            GamePathTBX.Text = _thisGame.Path;
-            GameNameTBX.Text = _thisGame.Name;
-            GameParametersTBX.Text = _thisGame.Parameters;
-        }
+
         private void SelectGamePathBTN_Click(object sender, RoutedEventArgs e)
         {
             if (GameFunctions.SelectGamePath(out string path) == true)
@@ -51,8 +42,6 @@ namespace Games_Launcher.Views
             _thisGame.Name = GameNameTBX.Text;
             _thisGame.Path = GamePathTBX.Text;
             _thisGame.ProcessName = Path.GetFileNameWithoutExtension(GamePathTBX.Text);
-            //App.window.CDU_Window..UpdateGames();
-            _thisGameView.UpdateInfo();
             Window.GetWindow(this).Close();
         }
         private void CancelarBTN_Click(object sender, RoutedEventArgs e) => Window.GetWindow(this).Close();

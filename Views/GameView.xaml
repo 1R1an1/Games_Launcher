@@ -10,7 +10,8 @@
             <Image x:Name="GameIconIMG"
                    Width="64"
                    Height="64"
-                   Source="/Img/ErrorImg.png"
+                   d:Source="/Img/ErrorImg.png"
+				   Source="{Binding Icon}"
                    Cursor="Hand"
                    VerticalAlignment="Top"
                    HorizontalAlignment="Left"
@@ -36,7 +37,8 @@
                                Foreground="White"
                                TextWrapping="Wrap" 
                                HorizontalAlignment="Left"
-                               Text="GAMETITLE"/>
+							   d:Text="GAMETITLE"
+                               Text="{Binding Name}"/>
                     
                     <StackPanel Orientation="Vertical"
                                 VerticalAlignment="Top"
@@ -55,7 +57,8 @@
                                VerticalAlignment="Top"
                                FontSize="13"
                                Padding="3, 0"
-                               Content="100,0 minutos"/>
+							   d:Content="100,0 minutos"
+                               Content="{Binding PlayTimeFormatted}"/>
                     </StackPanel>
                     <StackPanel Orientation="Vertical"
                                 VerticalAlignment="Top"
@@ -75,7 +78,8 @@
                                FontSize="13"
                                Padding="3, 0"
                                MaxWidth="125"
-                               Content="00/00/0000"/>
+							   d:Content="00/00/0000"
+                               Content="{Binding LastPlayedFormatted}"/>
                     </StackPanel>
                 </StackPanel>
                 

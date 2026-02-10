@@ -21,8 +21,7 @@
         <!--#endregion-->
         
         <!--#region controles de usuario-->
-        <Grid x:Name="aaaaaaaa" Grid.Row="1"/>
-        <!--<Views:ConfigGameView x:Name="CDU_Window" Grid.Row="1"/>-->
+        <Views:ConfigGameView x:Name="CDU_Window" Grid.Row="1"/>
         <!--#endregion-->
         
         <!--#region Parte De arriba-->

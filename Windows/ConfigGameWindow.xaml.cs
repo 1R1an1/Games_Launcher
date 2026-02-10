@@ -1,5 +1,4 @@
 ﻿using Games_Launcher.Model;
-using Games_Launcher.Views;
 using System.Windows;
 using System.Windows.Input;
 
@@ -10,13 +9,10 @@ namespace Games_Launcher.Windows
     /// </summary>
     public partial class ConfigGameWindow : Window
     {
-        private ConfigGameView CDU;
-        public ConfigGameWindow(GameModel game, GameView gameView)
+        public ConfigGameWindow(GameModel game)
         {
             InitializeComponent();
-            CDU = new ConfigGameView(game, gameView);
-			aaaaaaaa.Children.Add(CDU);
-            borde1.Visibility = Visibility.Visible;
+            CDU_Window.DataContext = game;
         }
 
         private void MoveWindow(object sender, MouseButtonEventArgs e)
@@ -26,7 +22,7 @@ namespace Games_Launcher.Windows
         }
         private void b_cerrar_Click(object sender, RoutedEventArgs e)
         {
-            if (!CDU.isMoving)
+            if (!CDU_Window.isMoving)
                 Close();
         }
         private void b_minimizar_Click(object sender, RoutedEventArgs e)

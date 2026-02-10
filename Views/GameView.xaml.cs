@@ -15,15 +15,14 @@ namespace Games_Launcher.Views
     /// </summary>
     public partial class GameView : UserControl
     {
-        public GameModel thisGame;
-        public Process[] _gameProcess;
+		public GameModel thisGame => (GameModel)DataContext;
+		public Process[] _gameProcess;
         public bool IsRunning = false;
         public DateTime starterTime = DateTime.Now;
 
-        public GameView()
+		public GameView()
         {
             InitializeComponent();
-            DataContextChanged += (s, e) => { if (e.NewValue is GameModel game) { thisGame = game; UpdateInfo(); } };
 
 			Loaded += (_, __) => GameMonitor.Register(this);
 			Unloaded += (_, __) => GameMonitor.Unregister(this);
@@ -65,18 +64,9 @@ namespace Games_Launcher.Views
             GamesInfo.Games.Remove(thisGame);
         }
 
-
-        public void UpdateInfo()
-        {
-            GameIconIMG.Source = GameFunctions.GetGameIcon(thisGame.Path);
-            GameTitleTB.Text = thisGame.Name;
-            LBLTimeOppend.Content = GameFunctions.ConvertTime(thisGame.PlayTime);
-            LBLLastOppend.Content = GameFunctions.UltimaVezJugado(thisGame.LastPlayed);
-        }
-
         private void GameIconIMG_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            ConfigGameWindow window = new ConfigGameWindow(thisGame, this);
+            ConfigGameWindow window = new ConfigGameWindow(thisGame);
             window.ShowDialog();
         }
 
