@@ -9,13 +9,14 @@ namespace Games_Launcher.Windows
     /// </summary>
     public partial class ConfigGameWindow : Window
     {
-        public ConfigGameWindow(GameModel game)
+        public ConfigGameWindow(GameViewModel game)
         {
             InitializeComponent();
             CDU_Window.DataContext = game;
-        }
+			borde1.Visibility = Visibility.Visible;
+		}
 
-        private void MoveWindow(object sender, MouseButtonEventArgs e)
+		private void MoveWindow(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
                 DragMove();

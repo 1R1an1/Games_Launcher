@@ -17,7 +17,7 @@ namespace Games_Launcher.Views
     /// </summary>
     public partial class ConfigGameView : UserControl
     {
-        private GameModel _thisGame => (GameModel)DataContext;
+        private GameViewModel _thisGame => (GameViewModel)DataContext;
         public bool isMoving;
 
         public ConfigGameView()
@@ -41,7 +41,7 @@ namespace Games_Launcher.Views
             _thisGame.Parameters = GameParametersTBX.Text;
             _thisGame.Name = GameNameTBX.Text;
             _thisGame.Path = GamePathTBX.Text;
-            _thisGame.ProcessName = Path.GetFileNameWithoutExtension(GamePathTBX.Text);
+            _thisGame._game.ProcessName = Path.GetFileNameWithoutExtension(GamePathTBX.Text);
             Window.GetWindow(this).Close();
         }
         private void CancelarBTN_Click(object sender, RoutedEventArgs e) => Window.GetWindow(this).Close();

@@ -11,7 +11,7 @@
                    Width="64"
                    Height="64"
                    d:Source="/Img/ErrorImg.png"
-				   Source="{Binding Icon}"
+				   Source="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=_viewModel.Icon}"
                    Cursor="Hand"
                    VerticalAlignment="Top"
                    HorizontalAlignment="Left"
@@ -38,7 +38,7 @@
                                TextWrapping="Wrap" 
                                HorizontalAlignment="Left"
 							   d:Text="GAMETITLE"
-                               Text="{Binding Name}"/>
+                               Text="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=_viewModel.Name}"/>
                     
                     <StackPanel Orientation="Vertical"
                                 VerticalAlignment="Top"
@@ -58,7 +58,7 @@
                                FontSize="13"
                                Padding="3, 0"
 							   d:Content="100,0 minutos"
-                               Content="{Binding PlayTimeFormatted}"/>
+                               Content="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=_viewModel.PlayTimeFormatted}"/>
                     </StackPanel>
                     <StackPanel Orientation="Vertical"
                                 VerticalAlignment="Top"
@@ -79,7 +79,7 @@
                                Padding="3, 0"
                                MaxWidth="125"
 							   d:Content="00/00/0000"
-                               Content="{Binding LastPlayedFormatted}"/>
+                               Content="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=_viewModel.LastPlayedFormatted}"/>
                     </StackPanel>
                 </StackPanel>
                 

@@ -16,6 +16,8 @@ namespace Games_Launcher.Views
     public partial class GameView : UserControl
     {
 		public GameModel thisGame => (GameModel)DataContext;
+		public GameViewModel _viewModel { get; set; }
+
 		public Process[] _gameProcess;
         public bool IsRunning = false;
         public DateTime starterTime = DateTime.Now;
@@ -26,6 +28,8 @@ namespace Games_Launcher.Views
 
 			Loaded += (_, __) => GameMonitor.Register(this);
 			Unloaded += (_, __) => GameMonitor.Unregister(this);
+
+            DataContextChanged += (_, e) => { if (e.NewValue is GameModel a) _viewModel = new GameViewModel(a); };
 		}
 
         public void BTNJugar_Click(object sender = null, RoutedEventArgs ea = null)
@@ -66,7 +70,7 @@ namespace Games_Launcher.Views
 
         private void GameIconIMG_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            ConfigGameWindow window = new ConfigGameWindow(thisGame);
+            ConfigGameWindow window = new ConfigGameWindow(_viewModel);
             window.ShowDialog();
         }
 
