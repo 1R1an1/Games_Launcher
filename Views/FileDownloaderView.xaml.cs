@@ -128,10 +128,10 @@ namespace Games_Launcher.Views
             try
             {
                 Uri uri = new Uri(FileURLTBX.Text);
-                foreach (var item in uri.Segments)
+                foreach (var item in uri.Segments.Reverse())
                 {
                     var parts = item.Trim('/').Split('.');
-                    if (parts.Length > 1 && parts.All(p => !string.IsNullOrEmpty(p)) && string.IsNullOrWhiteSpace(FileNameTBX.Text))
+                    if (parts.Length > 1 && parts.All(p => !string.IsNullOrEmpty(p)) && Path.HasExtension(item.Trim('/')) && string.IsNullOrWhiteSpace(FileNameTBX.Text))
                     {
                         FileNameTBX.Text = item.Trim('/');
                         break;
