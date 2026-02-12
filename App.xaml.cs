@@ -22,48 +22,22 @@ namespace Games_Launcher
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            _instance = new SingleInstanceManager("GamesLauncher_SingleInstance", "GamesLauncher_ShowWindow", out bool i);
-            if (i) return;
+			if (!InitializeSingleInstance())
+				return;
 
-            base.OnStartup(e);
-            CryptoUtils.iterations = 2500;
-            GamesInfo.CheckFileNames();
-            GamesInfo.LoadGamesData();
+			base.OnStartup(e);
 
-            _ = Task.Run(async () =>
-            {
-                while (true)
-                {
-                    await Task.Delay(60000);
-                    if (EnableAutoSave)
-                        GamesInfo.SaveGamesData();
-                }
-            });
+			InitializeCore();
+			InitializeWindow();
+			InitializeTray();
+			HandleStartupArgs(e.Args);
 
-            window = new MainWindow();
-            _windowController = new WindowController(window);
+			MainWindow = window;
+			Current.Exit += Current_Exit;
 
-            _notifyIcon = new NotifyIconController();
-            _notifyIcon.ShowRequested += Show;
-            _notifyIcon.ExitRequested += Shutdown;
-
-
-            if (e.Args.Any(a => a.Equals("-background", StringComparison.OrdinalIgnoreCase)))
-                Hide();
-            else
-            {
-                window.Show();
-                _notifyIcon.HideNIcon();
-            }
-
-            MainWindow = window;
-            App.Current.Exit += Current_Exit;
-
-            GameMonitor.StartLoop();
-            EnableAutoSave = true;
-
-            _instance.Listen(Show);
-        }
+			GameMonitor.StartLoop();
+			StartAutoSave();
+		}
 
         public static void Show() { _windowController.Show(); _notifyIcon.HideNIcon(); }
         public static void Hide() { _windowController.Hide(); _notifyIcon.ShowNIcon(); }
@@ -76,5 +50,65 @@ namespace Games_Launcher
         }
         public static void UpdateNIcons() => _notifyIcon.UpdateNICons();
 
-    }
+
+		private bool InitializeSingleInstance()
+		{
+			_instance = new SingleInstanceManager( "GamesLauncher_SingleInstance", "GamesLauncher_ShowWindow", out bool isSecondInstance);
+
+			if (isSecondInstance)
+				return false;
+
+			_instance.Listen(Show);
+			return true;
+		}
+
+		private void InitializeCore()
+		{
+			CryptoUtils.iterations = 2500;
+			GamesInfo.CheckFileNames();
+			GamesInfo.LoadGamesData();
+		}
+
+		private void InitializeWindow()
+		{
+			window = new MainWindow();
+			_windowController = new WindowController(window);
+		}
+
+		private void InitializeTray()
+		{
+			_notifyIcon = new NotifyIconController();
+			_notifyIcon.ShowRequested += Show;
+			_notifyIcon.ExitRequested += Shutdown;
+		}
+
+		private void HandleStartupArgs(string[] args)
+		{
+			if (args.Any(a => a.Equals("-background", StringComparison.OrdinalIgnoreCase)))
+			{
+				Hide();
+				_notifyIcon.ShowNIcon();
+			}
+			else
+			{
+				window.Show();
+				_notifyIcon.HideNIcon();
+			}
+		}
+
+		private void StartAutoSave()
+		{
+			EnableAutoSave = true;
+
+			_ = Task.Run(async () =>
+			{
+				while (true)
+				{
+					await Task.Delay(TimeSpan.FromMinutes(1));
+					if (EnableAutoSave)
+						GamesInfo.SaveGamesData();
+				}
+			});
+		}
+	}
 }

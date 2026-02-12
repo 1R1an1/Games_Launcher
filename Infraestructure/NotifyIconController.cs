@@ -22,7 +22,7 @@ namespace Games_Launcher.Infraestructure
 			{
 				Icon = Icon.ExtractAssociatedIcon(Process.GetCurrentProcess().MainModule.FileName),
 				Text = "Games Launcher",
-				Visible = true
+				Visible = false
 			};
 
 			UpdateNICons();
