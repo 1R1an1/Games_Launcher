@@ -29,7 +29,7 @@ namespace Games_Launcher.Core
                 return;
             }
 #if DEBUG
-            string jsonEncrypted = GameFunctions.Try(() => File.ReadAllText(Path.ChangeExtension(GAMESDATAFILE, ".json") ?? File.ReadAllText(GAMESDATAFILE)));
+            string jsonEncrypted = GameFunctions.Try(() => File.ReadAllText(Path.ChangeExtension(GAMESDATAFILE, ".json"))) ?? File.ReadAllText(GAMESDATAFILE);
 #else
             string jsonEncrypted = File.ReadAllText(GAMESDATAFILE);
 #endif
