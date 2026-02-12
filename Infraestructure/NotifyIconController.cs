@@ -14,7 +14,6 @@ namespace Games_Launcher.Infraestructure
 
         public event Action ShowRequested;
         public event Action ExitRequested;
-	    private T Try<T>(Func<T> f) { try { return f(); } catch { return default; } }
 
 		public NotifyIconController()
 		{
@@ -43,7 +42,7 @@ namespace Games_Launcher.Infraestructure
 			var menu = new ContextMenuStrip();
 			foreach (var item in GamesInfo.Games.OrderByDescending(x => x.LastPlayed).Take(5).ToList())
 			{
-				menu.Items.Add(item.Name, Try(() => Icon.ExtractAssociatedIcon(item.Path)?.ToBitmap()) ?? new Bitmap(App.GetResourceStream(new Uri("pack://application:,,,/Img/ErrorImg.png")).Stream),
+				menu.Items.Add(item.Name, GameFunctions.Try(() => Icon.ExtractAssociatedIcon(item.Path)?.ToBitmap()) ?? new Bitmap(App.GetResourceStream(new Uri("pack://application:,,,/Img/ErrorImg.png")).Stream),
 					(s, e) =>
 					{
 						var gameView = GameFunctions.GetGameViewFromItem(App.window.CDU_Window.GamesItemsControl, item);

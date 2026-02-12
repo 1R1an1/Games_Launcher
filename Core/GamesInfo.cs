@@ -28,8 +28,12 @@ namespace Games_Launcher.Core
                 CreateDefaultData();
                 return;
             }
+#if DEBUG
+            string jsonEncrypted = GameFunctions.Try(() => File.ReadAllText(Path.ChangeExtension(GAMESDATAFILE, ".json") ?? File.ReadAllText(GAMESDATAFILE)));
+#else
             string jsonEncrypted = File.ReadAllText(GAMESDATAFILE);
-            string json = "";
+#endif
+			string json = "";
             try { json = AES256.Decrypt(jsonEncrypted, CryptoUtils.defaultPassword); } catch { json = jsonEncrypted; }
 
             try
@@ -84,11 +88,15 @@ namespace Games_Launcher.Core
             _appData.JsonDataVersion = CURRENTDATAVERSION;
 
             string json = JsonConvert.SerializeObject(_appData, Formatting.Indented);
+#if DEBUG
+            File.WriteAllText(Path.ChangeExtension(GAMESDATAFILE, ".json"), json);
+#else
             string jsonEncrypted = AES256.Encrypt(json, CryptoUtils.defaultPassword);
             File.WriteAllText(GAMESDATAFILE, jsonEncrypted);
+#endif
         }
 
-        private static void SaveGamesData(object obj)
+		private static void SaveGamesData(object obj)
         {
             if (obj == null)
                 return;

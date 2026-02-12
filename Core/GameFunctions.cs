@@ -13,7 +13,9 @@ namespace Games_Launcher.Core
 {
     public static class GameFunctions
     {
-        public static BitmapImage GetGameIcon(string gamePath)
+		public static T Try<T>(Func<T> f) { try { return f(); } catch { return default; } }
+
+		public static BitmapImage GetGameIcon(string gamePath)
         {
             if (string.IsNullOrEmpty(gamePath) || !File.Exists(gamePath))
                 return new BitmapImage(new Uri("pack://application:,,,/Img/ErrorImg.png"));

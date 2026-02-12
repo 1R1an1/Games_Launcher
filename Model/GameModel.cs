@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 namespace Games_Launcher.Model
 {
@@ -10,5 +11,8 @@ namespace Games_Launcher.Model
 		public string Path;
 		public DateTime LastPlayed;
 		public TimeSpan PlayTime;
+
+		[JsonIgnore]
+		public bool IsRunning = false;
 	}
 }

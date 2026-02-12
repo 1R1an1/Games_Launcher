@@ -1,64 +1,53 @@
-﻿using Games_Launcher.Views;
+﻿using Games_Launcher.Model;
+using Games_Launcher.Views;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 
 namespace Games_Launcher.Core
 {
     public static class GameMonitor
     {
-        private static readonly List<GameView> _views = new List<GameView>();
         private static bool _isRunning = false;
         private static readonly object _lock = new object();
-        private static List<GameView> runingGames = new List<GameView>();
-
-        /// <summary>
-        /// Agrega un nuevo GameView a la lista de monitoreo.
-        /// </summary>
-        public static void Register(GameView view)
-        {
-            lock (_lock)
-            {
-				if (!_views.Contains(view))
-					_views.Add(view);
-			}
-        }
-
-        public static void Unregister(GameView view)
-        {
-            lock (_lock)
-            {
-                _views.Remove(view);
-            }
-        }
+        private static List<GameModel> runingGames = new List<GameModel>();
+        private static ItemsControl ItemsHost => App.window.CDU_Window.GamesItemsControl;
 
         public static void StartLoop()
         {
-
             _ = Task.Run(async () =>
             {
                 _isRunning = true;
 
                 while (_isRunning)
                 {
-                    GameView[] currentViews;
+                    GameModel[] currentGames;
 
                     // Evitamos modificar la lista mientras se recorre
                     lock (_lock)
                     {
-                        currentViews = _views.ToArray();
+                        currentGames = GamesInfo.Games.ToArray();
                     }
 
-                    foreach (var view in currentViews)
+                    foreach (var game in currentGames)
                     {
-                        view._gameProcess = Process.GetProcessesByName(view.thisGame.ProcessName);
-                        bool currentlyRunning = view._gameProcess.Length > 0;
+                        var processes = Process.GetProcessesByName(game.ProcessName);
+                        bool currentlyRunning = processes.Length > 0;
 
-                        if (currentlyRunning && !view.IsRunning)
+                        if (currentlyRunning && !game.IsRunning)
                         {
+                            runingGames.Add(game);
+                            game.IsRunning = true;
+                            game.LastPlayed = DateTime.Now;
+
+                            GameView view = App.Current.Dispatcher.Invoke(() => GameFunctions.GetGameViewFromItem(ItemsHost, game));
+                            if (view == null) continue;
+
                             view.Dispatcher.Invoke(() =>
                             {
                                 view.BTNJugar.Margin = new Thickness(22.3, 0, 11.2, 0);
@@ -67,16 +56,20 @@ namespace Games_Launcher.Core
                                 view.BTNJugar.Foreground = Brushes.White;
                                 view.BTNJugar.Tag = view.FindResource("DownloadColorNormal");
                                 view.BTNJugar.BorderBrush = (Brush)view.FindResource("DownloadColorMouseOver");
+                                view.LBLLastOppend.Content = GameFunctions.UltimaVezJugado(view.thisGame.LastPlayed);
+                                App.UpdateNIcons();
                             });
-
-                            runingGames.Add(view);
-                            view.IsRunning = true;
-                            view.thisGame.LastPlayed = DateTime.Now;
-                            view.Dispatcher.Invoke(() => view.LBLLastOppend.Content = GameFunctions.UltimaVezJugado(view.thisGame.LastPlayed));
-                            App.Current.Dispatcher.Invoke(() => App.UpdateNIcons());
                         }
-                        else if (!currentlyRunning && view.IsRunning)
+                        else if (!currentlyRunning && game.IsRunning)
                         {
+                            runingGames.Remove(game);
+                            game.IsRunning = false;
+                            TimeSpan duration = DateTime.Now - game.LastPlayed;
+                            game.PlayTime += duration;
+
+                            GameView view = App.Current.Dispatcher.Invoke(() => GameFunctions.GetGameViewFromItem(ItemsHost, game));
+                            if (view == null) continue;
+
                             view.Dispatcher.Invoke(() =>
                             {
                                 view.BTNJugar.Margin = new Thickness(31.65, 0, 20.55, 0);
@@ -85,14 +78,8 @@ namespace Games_Launcher.Core
                                 view.BTNJugar.Foreground = Brushes.White;
                                 view.BTNJugar.Tag = view.FindResource("JugarColorNormal");
                                 view.BTNJugar.BorderBrush = (Brush)view.FindResource("JugarColorMouseOver");
+                                view.LBLTimeOppend.Content = GameFunctions.ConvertTime(view.thisGame.PlayTime);
                             });
-
-                            runingGames.Remove(view);
-                            view.IsRunning = false;
-                            TimeSpan duration = DateTime.Now - view.thisGame.LastPlayed;
-                            view.thisGame.PlayTime += duration;
-
-                            view.Dispatcher.Invoke(() => view.LBLTimeOppend.Content = GameFunctions.ConvertTime(view.thisGame.PlayTime));
                         }
                     }
 
@@ -109,11 +96,15 @@ namespace Games_Launcher.Core
             if (runingGames.Count > 0)
             {
                 _isRunning = false;
-                foreach (var item in runingGames)
+                lock (_lock)
                 {
-                    item.thisGame.PlayTime += (DateTime.Now - item.thisGame.LastPlayed);
+                    foreach (var game in runingGames)
+                    {
+                        game.PlayTime += (DateTime.Now - game.LastPlayed);
+                        game.IsRunning = false;
+                    }
+                    runingGames.Clear();
                 }
-                runingGames.Clear();
             }
         }
     }

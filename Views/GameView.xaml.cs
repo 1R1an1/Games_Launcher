@@ -18,23 +18,18 @@ namespace Games_Launcher.Views
 		public GameModel thisGame => (GameModel)DataContext;
 		public GameViewModel _viewModel { get; set; }
 
-		public Process[] _gameProcess;
-        public bool IsRunning = false;
         public DateTime starterTime = DateTime.Now;
 
 		public GameView()
         {
             InitializeComponent();
 
-			Loaded += (_, __) => GameMonitor.Register(this);
-			Unloaded += (_, __) => GameMonitor.Unregister(this);
-
             DataContextChanged += (_, e) => { if (e.NewValue is GameModel a) _viewModel = new GameViewModel(a); };
 		}
 
         public void BTNJugar_Click(object sender = null, RoutedEventArgs ea = null)
         {
-            if (!IsRunning)
+            if (!thisGame.IsRunning)
             {
                 try
                 {
@@ -54,8 +49,8 @@ namespace Games_Launcher.Views
                     MessageBox.Show($"No se pudo iniciar el juego. Verifica que la ruta y los parámetros sean correctos.\n\nError: {e.Message} ({e.HResult})", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            else if (IsRunning && App.window.IsVisible)
-                foreach (var process in _gameProcess)
+            else if (thisGame.IsRunning && App.window.IsVisible)
+                foreach (var process in Process.GetProcessesByName(thisGame.ProcessName))
                     process.Kill();
 
 
