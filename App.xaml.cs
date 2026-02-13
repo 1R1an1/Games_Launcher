@@ -65,7 +65,9 @@ namespace Games_Launcher
 		private void InitializeCore()
 		{
 			CryptoUtils.iterations = 2500;
+#if !DEBUG
 			GamesInfo.CheckFileNames();
+#endif
 			GamesInfo.LoadGamesData();
 		}
 
