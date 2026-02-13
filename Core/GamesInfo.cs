@@ -23,14 +23,20 @@ namespace Games_Launcher.Core
 
         public static void LoadGamesData()
         {
+
+#if DEBUG
+			if (!File.Exists(GAMESDATAFILE) && !File.Exists(Path.ChangeExtension(GAMESDATAFILE, ".json")))
+			{
+				CreateDefaultData();
+				return;
+			}
+			string jsonEncrypted = GameFunctions.Try(() => File.ReadAllText(Path.ChangeExtension(GAMESDATAFILE, ".json"))) ?? File.ReadAllText(GAMESDATAFILE);
+#else
             if (!File.Exists(GAMESDATAFILE))
             {
                 CreateDefaultData();
                 return;
             }
-#if DEBUG
-            string jsonEncrypted = GameFunctions.Try(() => File.ReadAllText(Path.ChangeExtension(GAMESDATAFILE, ".json"))) ?? File.ReadAllText(GAMESDATAFILE);
-#else
             string jsonEncrypted = File.ReadAllText(GAMESDATAFILE);
 #endif
 			string json = "";
