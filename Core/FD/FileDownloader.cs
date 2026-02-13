@@ -70,9 +70,9 @@ namespace Games_Launcher.Core.FD
                 {
                     await DownloadCoreHttp(response, tempPath, existingLength);
                     string final = GetAvailableFileName(finalPath);
-                    File.Move(tempPath, GetAvailableFileName(final));
+                    File.Move(tempPath, final);
 
-                    OnStateChanged?.Invoke(new DownloadState() { Status = DownloadStatus.Finished, FinalPath = GetAvailableFileName(final) });
+                    OnStateChanged?.Invoke(new DownloadState() { Status = DownloadStatus.Finished, FinalPath = final });
                 }
                 catch (OperationCanceledException)
                 {
