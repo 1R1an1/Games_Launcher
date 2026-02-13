@@ -92,6 +92,9 @@
     <Compile Include="Views\ConfigView.xaml.cs">
       <DependentUpon>ConfigView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\MoveGameView.xaml.cs">
+      <DependentUpon>MoveGameView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\ConfigGameWindow.xaml.cs">
       <DependentUpon>ConfigGameWindow.xaml</DependentUpon>
     </Compile>
@@ -115,7 +118,14 @@
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Windows\MoveGameWindow.xaml.cs">
+      <DependentUpon>MoveGameWindow.xaml</DependentUpon>
+    </Compile>
     <Page Include="Views\ConfigView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\MoveGameView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -174,6 +184,10 @@
     <Page Include="Views\MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Windows\MoveGameWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>

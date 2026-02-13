@@ -4,8 +4,6 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -59,7 +57,7 @@ namespace Games_Launcher.Views
             Process.Start("explorer.exe", Path.GetDirectoryName(_thisGame.Path));
         }
 
-		private async void MoverBTN_Click(object sender, RoutedEventArgs e)
+		/*private async void MoverBTN_Click(object sender, RoutedEventArgs e)
 		{
 			if (MessageBox.Show(Window.GetWindow(this), "¿Estas seguro que deseas mover el juego de carpeta? \nSolo se moveran los archivos del juego a otra carpeta, nada mas.", "ADVERTENCIA", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
 				return;
@@ -139,7 +137,7 @@ namespace Games_Launcher.Views
 			SetEnabledControl(AplicarBTN, true);
 			isMoving = false;
 			bprgbr.Visibility = Visibility.Collapsed;
-		}
+		}*/
 		private string SeleccionarCarpeta(string titulo)
 		{
 			while (true)
