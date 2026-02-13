@@ -16,6 +16,10 @@ namespace Games_Launcher.Views
 	public partial class MoveGameView : UserControl
 	{
 		public bool IsMoving = false;
+		private long totalTamaño = 0;
+		private int totalArchivos = 0;
+		private string[] archivos;
+
 		private GameViewModel thisGame => (GameViewModel)DataContext;
 		public MoveGameView()
 		{
@@ -31,10 +35,32 @@ namespace Games_Launcher.Views
 
 		private async void MoverBTN_Click(object sender, RoutedEventArgs e)
 		{
-			if (!Directory.Exists(RootPathTBX.Text) || !EsRutaValidaParaSeleccion(Path.GetDirectoryName(thisGame.Path), RootPathTBX.Text) || !Directory.Exists(MovePathTBX.Text))
+			string rootPath = Path.GetFullPath(RootPathTBX.Text).TrimEnd(Path.DirectorySeparatorChar);
+			string movePath = Path.GetFullPath(MovePathTBX.Text).TrimEnd(Path.DirectorySeparatorChar);
+
+			if (!Directory.Exists(RootPathTBX.Text) ||
+				!Directory.Exists(MovePathTBX.Text) ||
+				!EsRutaValidaParaSeleccion(Path.GetDirectoryName(thisGame.Path), RootPathTBX.Text) ||
+				rootPath.Equals(movePath, StringComparison.OrdinalIgnoreCase) ||
+				rootPath.StartsWith(movePath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
 			{
 				MessageBox.Show(Window.GetWindow(this), "Por favor, asegúrate de que ambas rutas sean válidas antes de mover el juego.", "Rutas inválidas", MessageBoxButton.OK, MessageBoxImage.Error);
 				return;
+			}
+
+			string carpetaJuegoDestino = Path.Combine(movePath, new DirectoryInfo(RootPathTBX.Text).Name);
+			if (Directory.Exists(carpetaJuegoDestino) && Directory.GetFiles(carpetaJuegoDestino, "*", SearchOption.AllDirectories).Length > 0)
+			{
+				var result = MessageBox.Show(Window.GetWindow(this),
+					$"La carpeta {carpetaJuegoDestino} ya existe y contiene archivos.\n¿Desea continuar y eliminarla AHORA?",
+					"Advertencia",
+					MessageBoxButton.YesNo,
+					MessageBoxImage.Warning);
+
+				if (result != MessageBoxResult.Yes)
+					return; // El usuario canceló
+
+				Directory.Delete(carpetaJuegoDestino, true);
 			}
 
 			IsMoving = true;
@@ -44,19 +70,25 @@ namespace Games_Launcher.Views
 			SetEnabledControl(MovePathTBX, !IsMoving);
 			ProgressTextBlock.Visibility = Visibility.Visible;
 
-			string rootPath = RootPathTBX.Text;
-			string movePath = MovePathTBX.Text;
+			rootPath = RootPathTBX.Text;
+			movePath = MovePathTBX.Text;
 
 			prgbr.IsIndeterminate = true;
+			await Task.Run(() => CalcularTotal(rootPath));
 			prgbr.Minimum = 0;
-			prgbr.Maximum = await Task.Run(() => Directory.GetFiles(rootPath, "*", SearchOption.AllDirectories).Length);
+			prgbr.Maximum = totalTamaño;
 			prgbr.Value = 0;
 			prgbr.IsIndeterminate = false;
 
-			var progreso = new Progress<(int, string)>(valor =>
+			var progreso = new Progress<(long, int, string)>(valor =>
 			{
 				prgbr.Value = valor.Item1;
-				ProgressTextBlock.Text = $"Moviendo . . . {(double)valor.Item1 / prgbr.Maximum * 100}% \n{valor.Item2}";
+
+				long restante = (long)prgbr.Maximum - valor.Item1;
+
+				ProgressTextBlock.Text = $"Moviendo . . . {(double)valor.Item1 / prgbr.Maximum:P2} \n" +
+									     $"Archivos restantes: {totalArchivos - valor.Item2} ({Core.FD.FileDownloaderUtils.FormatFileSize(restante)}) \n" +
+										 $"Archivo: {valor.Item3}";
 			});
 
 			try
@@ -73,8 +105,16 @@ namespace Games_Launcher.Views
 				MessageBox.Show(Window.GetWindow(this), "Movimiento cancelado.");
 			}
 		}
-
-		private string MoverJuego(string gamePath, string gameMovePath, IProgress<(int, string)> progreso)
+		private void CalcularTotal(string gamePath)
+		{
+			archivos = Directory.GetFiles(gamePath, "*", SearchOption.AllDirectories);
+			totalArchivos = archivos.Length;
+			foreach (var archivo in archivos)
+			{
+				totalTamaño += new FileInfo(archivo).Length;
+			}
+		}
+		private string MoverJuego(string gamePath, string gameMovePath, IProgress<(long, int, string)> progreso)
 		{
 			string nombreCarpetaOrigen = new DirectoryInfo(gamePath).Name;
 
@@ -82,9 +122,8 @@ namespace Games_Launcher.Views
 								  .Equals(nombreCarpetaOrigen, StringComparison.OrdinalIgnoreCase)
 								  ? gameMovePath : Path.Combine(gameMovePath, nombreCarpetaOrigen);
 
-			var archivos = Directory.GetFiles(gamePath, "*", SearchOption.AllDirectories);
 
-			int total = archivos.Length;
+			long pesomovido = 0;
 			int movidos = 0;
 
 			foreach (var archivo in archivos)
@@ -94,8 +133,10 @@ namespace Games_Launcher.Views
 
 				Directory.CreateDirectory(Path.GetDirectoryName(destinoArchivo)!);
 
-				var a = Core.FD.FileDownloaderUtils.FormatFileSize(new FileInfo(archivo).Length);
-				progreso?.Report((movidos, $"{relativo}  ({a})"));
+				var tamañoArchivo = new FileInfo(archivo).Length;
+				var a = Core.FD.FileDownloaderUtils.FormatFileSize(tamañoArchivo);
+				progreso?.Report((pesomovido, movidos, $"{relativo}  ({a})"));
+
 				try
 				{
 					File.Move(archivo, destinoArchivo);
@@ -109,8 +150,9 @@ namespace Games_Launcher.Views
 					}
 				}
 
+				pesomovido += tamañoArchivo;
 				movidos++;
-				progreso?.Report((movidos, $"{relativo}  ({a})"));
+				progreso?.Report((pesomovido, movidos, $"{relativo}  ({a})"));
 			}
 
 			foreach (var carpeta in Directory.GetDirectories(gamePath, "*", SearchOption.AllDirectories).OrderByDescending(c => c.Length))
@@ -191,7 +233,7 @@ namespace Games_Launcher.Views
 
 			// True si la carpeta seleccionada es la misma que la ruta base
 			if (rutaVerificar.Equals(rutaBase, StringComparison.OrdinalIgnoreCase))
-				return false;
+				return true;
 
 			// True si la carpeta está por encima de la ruta base
 			return rutaBase.StartsWith(rutaVerificar + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);

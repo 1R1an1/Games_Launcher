@@ -5,14 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:Games_Launcher.Views"
              mc:Ignorable="d" 
-             Width="750">
-	<Grid Margin="12">
+             Width="900">
+	<Grid Margin="15" HorizontalAlignment="Stretch">
 		<Grid.RowDefinitions>
 			<RowDefinition Height="100"/>
 			<RowDefinition Height="*"/>
 		</Grid.RowDefinitions>
-		<StackPanel Orientation="Horizontal" Margin="10">
-			<Image d:Source="/Img/ErrorImg.png" Source="{Binding Icon}" Margin="30, 7.5, 7.5, 7.5"/>
+		<StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="10">
+			<Image d:Source="/Img/ErrorImg.png" Source="{Binding Icon}" Margin="0, 7.5, 7.5, 7.5"/>
 			<TextBlock Style="{StaticResource TBK}" Text="{Binding Name}" d:Text="GAME TITLE"
 				       TextAlignment="Center" Foreground="White" TextWrapping="Wrap" FontSize="20"
 					   Width="172" Margin="0,0,0,25"/>
@@ -94,7 +94,7 @@
 
 			<Border x:Name="bprgbr" Visibility="Visible" BorderBrush="#333" HorizontalAlignment="Stretch"
 					Padding="1" BorderThickness="4" Margin="50,10">
-				<ProgressBar x:Name="prgbr"
+				<ProgressBar x:Name="prgbr" d:Value="65"
 							 Minimum="0" Maximum="100" Value="0"
 							 Height="20" Background="#333"
 							 BorderThickness="0" BorderBrush="#333"/>
@@ -102,7 +102,11 @@
 
 			<TextBlock x:Name="ProgressTextBlock" Style="{StaticResource TBK}"
 					   FontSize="16" TextAlignment="Center" Visibility="Collapsed"
-					   Margin="0,5,0,0" Text="Moviendo . . ." TextWrapping="Wrap"/>
+					   Margin="0,5,0,0" Text="Moviendo . . ." TextWrapping="Wrap"
+					   
+					   d:Visibility="Visible"
+					   d:Text="Moviendo . . . 65% &#10;Archivos restantes: 1213 (123 MB) &#10;Archivo: wadawdaw\wdajwda.das (2 MB)"
+					   />
 		</StackPanel>
 	</Grid>
 </UserControl>
