@@ -50,7 +50,7 @@
                     Style="{StaticResource ButtonStyle}"
                     Content="Mover"
                     FontSize="17"
-                    Margin="30, 0"
+                    Margin="30, 0" Click="MoverBTN_Click"
                     />
 
 			<Button x:Name="CancelarBTN"

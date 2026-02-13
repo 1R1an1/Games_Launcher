@@ -2,8 +2,11 @@
 using Microsoft.WindowsAPICodePack.Dialogs;
 using System;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace Games_Launcher.Views
 {
@@ -12,6 +15,7 @@ namespace Games_Launcher.Views
 	/// </summary>
 	public partial class MoveGameView : UserControl
 	{
+		public bool IsMoving = false;
 		private GameViewModel thisGame => (GameViewModel)DataContext;
 		public MoveGameView()
 		{
@@ -25,14 +29,121 @@ namespace Games_Launcher.Views
 			};
 		}
 
-		private void MoverBTN_Click(object sender, RoutedEventArgs e)
+		private async void MoverBTN_Click(object sender, RoutedEventArgs e)
 		{
+			if (!Directory.Exists(RootPathTBX.Text) || !EsRutaValidaParaSeleccion(Path.GetDirectoryName(thisGame.Path), RootPathTBX.Text) || !Directory.Exists(MovePathTBX.Text))
+			{
+				MessageBox.Show(Window.GetWindow(this), "Por favor, asegúrate de que ambas rutas sean válidas antes de mover el juego.", "Rutas inválidas", MessageBoxButton.OK, MessageBoxImage.Error);
+				return;
+			}
 
+			IsMoving = true;
+			SetEnabledControl(MoverBTN, !IsMoving);
+			SetEnabledControl(CancelarBTN, !IsMoving);
+			SetEnabledControl(RootPathTBX, !IsMoving);
+			SetEnabledControl(MovePathTBX, !IsMoving);
+			ProgressTextBlock.Visibility = Visibility.Visible;
+
+			string rootPath = RootPathTBX.Text;
+			string movePath = MovePathTBX.Text;
+
+			prgbr.IsIndeterminate = true;
+			prgbr.Minimum = 0;
+			prgbr.Maximum = await Task.Run(() => Directory.GetFiles(rootPath, "*", SearchOption.AllDirectories).Length);
+			prgbr.Value = 0;
+			prgbr.IsIndeterminate = false;
+
+			var progreso = new Progress<(int, string)>(valor =>
+			{
+				prgbr.Value = valor.Item1;
+				ProgressTextBlock.Text = $"Moviendo . . . {(double)valor.Item1 / prgbr.Maximum * 100}% \n{valor.Item2}";
+			});
+
+			try
+			{
+			    thisGame.Path = Path.Combine(await Task.Run(() => MoverJuego(rootPath, movePath, progreso)), Path.GetFileName(thisGame.Path));
+
+				MessageBox.Show(Window.GetWindow(this), "El juego se movió correctamente.");
+				IsMoving = false;
+				SetEnabledControl(CancelarBTN, !IsMoving);
+				CancelarBTN.Content = "Cerrar";
+			}
+			catch (OperationCanceledException)
+			{
+				MessageBox.Show(Window.GetWindow(this), "Movimiento cancelado.");
+			}
+		}
+
+		private string MoverJuego(string gamePath, string gameMovePath, IProgress<(int, string)> progreso)
+		{
+			string nombreCarpetaOrigen = new DirectoryInfo(gamePath).Name;
+
+			string destinoFinal = Path.GetFileName(gameMovePath.TrimEnd(Path.DirectorySeparatorChar))
+								  .Equals(nombreCarpetaOrigen, StringComparison.OrdinalIgnoreCase)
+								  ? gameMovePath : Path.Combine(gameMovePath, nombreCarpetaOrigen);
+
+			var archivos = Directory.GetFiles(gamePath, "*", SearchOption.AllDirectories);
+
+			int total = archivos.Length;
+			int movidos = 0;
+
+			foreach (var archivo in archivos)
+			{
+				string relativo = archivo.Substring(gamePath.Length).TrimStart(Path.DirectorySeparatorChar); ;
+				string destinoArchivo = Path.Combine(destinoFinal, relativo);
+
+				Directory.CreateDirectory(Path.GetDirectoryName(destinoArchivo)!);
+
+				var a = Core.FD.FileDownloaderUtils.FormatFileSize(new FileInfo(archivo).Length);
+				progreso?.Report((movidos, $"{relativo}  ({a})"));
+				try
+				{
+					File.Move(archivo, destinoArchivo);
+				}
+				catch (IOException)
+				{
+					if (MessageBox.Show(Window.GetWindow(this), $"Desea remplazar el archivo: {destinoArchivo}\nPor el archivo: {archivo}", "", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes)
+					{
+						File.Delete(destinoArchivo);
+						File.Move(archivo, destinoArchivo);
+					}
+				}
+
+				movidos++;
+				progreso?.Report((movidos, $"{relativo}  ({a})"));
+			}
+
+			foreach (var carpeta in Directory.GetDirectories(gamePath, "*", SearchOption.AllDirectories).OrderByDescending(c => c.Length))
+			{
+				if (Directory.GetFiles(carpeta).Length == 0 && Directory.GetDirectories(carpeta).Length == 0)
+				{
+					try { Directory.Delete(carpeta, false); }
+					catch { }
+				}
+
+			}
+			try { Directory.Delete(gamePath, false); }
+			catch { }
+			return destinoFinal;
+		}
+
+		public static string GetRelativePath(string basePath, string fullPath)
+		{
+			if (!basePath.EndsWith(Path.DirectorySeparatorChar.ToString()))
+				basePath += Path.DirectorySeparatorChar;
+
+			Uri baseUri = new Uri(basePath);
+			Uri fullUri = new Uri(fullPath);
+
+			return Uri.UnescapeDataString(
+				baseUri.MakeRelativeUri(fullUri)
+					   .ToString()
+					   .Replace('/', Path.DirectorySeparatorChar));
 		}
 
 		private void CancelarBTN_Click(object sender, RoutedEventArgs e)
 		{
-
+			Window.GetWindow(this).Close();
 		}
 		private void SelectGameRootPathBTN_Click(object sender, RoutedEventArgs e)
 		{
@@ -49,9 +160,10 @@ namespace Games_Launcher.Views
 				}
 				else
 				{
-					MessageBox.Show("La ruta seleccionada no es valida", "error", MessageBoxButton.OK, MessageBoxImage.Error);
+					MessageBox.Show(Window.GetWindow(this), "La ruta seleccionada no es valida", "error", MessageBoxButton.OK, MessageBoxImage.Error);
 				}
 			}
+			Window.GetWindow(this).Focus();
 		}
 
 		private void SelectGameMovePathBTN_Click(object sender, RoutedEventArgs e)
@@ -64,6 +176,7 @@ namespace Games_Launcher.Views
 			{
 				MovePathTBX.Text = dialog.FileName;
 			}
+			Window.GetWindow(this).Focus();
 		}
 
 		bool EsRutaValidaParaSeleccion(string rutaBase, string rutaVerificar)
@@ -78,7 +191,7 @@ namespace Games_Launcher.Views
 
 			// True si la carpeta seleccionada es la misma que la ruta base
 			if (rutaVerificar.Equals(rutaBase, StringComparison.OrdinalIgnoreCase))
-				return true;
+				return false;
 
 			// True si la carpeta está por encima de la ruta base
 			return rutaBase.StartsWith(rutaVerificar + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase);
@@ -130,5 +243,20 @@ namespace Games_Launcher.Views
 			return count;
 		}
 
+		private void SetEnabledControl(Control element, bool SetEnabledValue)
+		{
+			if (!SetEnabledValue)
+			{
+				element.IsEnabled = false;
+				element.Tag = (Brush)FindResource("NormalColorDisabled");
+				element.Foreground = (Brush)FindResource("FontColorDisabled");
+			}
+			else
+			{
+				element.IsEnabled = true;
+				element.Tag = (Brush)FindResource("NormalColorNormal");
+				element.Foreground = (Brush)FindResource("FontColor");
+			}
+		}
 	}
 }

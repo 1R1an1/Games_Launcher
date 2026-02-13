@@ -23,7 +23,8 @@ namespace Games_Launcher.Windows
 		}
 		private void b_cerrar_Click(object sender, RoutedEventArgs e)
 		{
-			Close();
+            if (!CDU_Window.IsMoving)
+				Close();
 		}
 		private void b_minimizar_Click(object sender, RoutedEventArgs e)
 		{

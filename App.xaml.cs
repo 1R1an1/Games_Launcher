@@ -1,11 +1,7 @@
 ﻿using FortiCrypts;
 using Games_Launcher.Core;
 using Games_Launcher.Infraestructure;
-using Games_Launcher.Model;
-using Games_Launcher.Windows;
-using Newtonsoft.Json;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -26,10 +22,6 @@ namespace Games_Launcher
 
         protected override void OnStartup(StartupEventArgs e)
         {
-			var a = JsonConvert.DeserializeObject<AppModel>(File.ReadAllText(Path.ChangeExtension(GamesInfo.GAMESDATAFILE, ".json"))).Games;
-			a[2].Path = "D:\\SteamLibrary\\steamapps\\common\\Borderlands 2\\Binaries\\Win32\\Borderlands2.exe";
-			new MoveGameWindow(new GameViewModel(a[2])).ShowDialog();
-			Shutdown();
 
 			if (!InitializeSingleInstance())
 				return;
