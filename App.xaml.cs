@@ -87,6 +87,9 @@ namespace Games_Launcher
 
 		private void HandleStartupArgs(string[] args)
 		{
+			window.ShowInTaskbar = false;
+			window.Show();
+
 			if (args.Any(a => a.Equals("-background", StringComparison.OrdinalIgnoreCase)))
 			{
 				Hide();
@@ -94,7 +97,7 @@ namespace Games_Launcher
 			}
 			else
 			{
-				window.Show();
+				window.ShowInTaskbar = true;
 				_notifyIcon.HideNIcon();
 			}
 		}
