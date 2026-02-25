@@ -2,6 +2,7 @@
 using Games_Launcher.Model;
 using Games_Launcher.Windows;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
@@ -18,16 +19,46 @@ namespace Games_Launcher.Views
 		public GameModel thisGame => (GameModel)DataContext;
 		public GameViewModel _viewModel { get; set; }
 
-        public DateTime starterTime = DateTime.Now;
-
 		public GameView()
         {
             InitializeComponent();
+            Init();
+		}
+        private void Init()
+        {
+            DataContextChanged += (_, e) =>
+            {
+				if (e.OldValue is GameModel oldGame)
+					oldGame.PropertyChanged -= Game_PropertyChanged;
 
-            DataContextChanged += (_, e) => { if (e.NewValue is GameModel a) _viewModel = new GameViewModel(a); };
+				if (e.NewValue is GameModel newGame)
+				{
+                    _viewModel = new GameViewModel(newGame);
+					newGame.PropertyChanged += Game_PropertyChanged;
+
+					if (newGame.IsRunning)
+						ChangeToStopBTN();
+					else
+						ChangeToPlayBTN();
+				}
+            };
 		}
 
-        public void BTNJugar_Click(object sender = null, RoutedEventArgs ea = null)
+		private void Game_PropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (e.PropertyName == nameof(GameModel.IsRunning))
+			{
+				Dispatcher.Invoke(() =>
+				{
+					if (thisGame.IsRunning)
+						ChangeToStopBTN();
+					else
+						ChangeToPlayBTN();
+				});
+			}
+		}
+
+		public void BTNJugar_Click(object sender = null, RoutedEventArgs ea = null)
         {
             if (!thisGame.IsRunning)
             {
@@ -70,9 +101,35 @@ namespace Games_Launcher.Views
         }
 
         private void BTNUp_Click(object sender, RoutedEventArgs e) => GamesInfo.Games.Mover(GamesInfo.Games.IndexOf(thisGame), -1);
-        
-
         private void BTNDown_Click(object sender, RoutedEventArgs e) => GamesInfo.Games.Mover(GamesInfo.Games.IndexOf(thisGame), +1);
         
+        private void ChangeToPlayBTN()
+        {
+			Dispatcher.Invoke(() =>
+			{
+				BTNJugar.Margin = new Thickness(31.65, 0, 20.55, 0);
+				BTNJugar.IsEnabled = true;
+				BTNJugar.Content = "JUGAR";
+				BTNJugar.Foreground = Brushes.White;
+				BTNJugar.Tag = FindResource("JugarColorNormal");
+				BTNJugar.BorderBrush = (Brush)FindResource("JugarColorMouseOver");
+				LBLTimeOppend.Content = GameFunctions.ConvertTime(thisGame.PlayTime);
+			});
+		}
+
+        private void ChangeToStopBTN()
+        {
+			Dispatcher.Invoke(() =>
+			{
+				BTNJugar.Margin = new Thickness(22.3, 0, 11.2, 0);
+				BTNJugar.IsEnabled = true;
+				BTNJugar.Content = "DETENER";
+				BTNJugar.Foreground = Brushes.White;
+				BTNJugar.Tag = FindResource("DownloadColorNormal");
+				BTNJugar.BorderBrush = (Brush)FindResource("DownloadColorMouseOver");
+				LBLLastOppend.Content = GameFunctions.UltimaVezJugado(thisGame.LastPlayed);
+				App.UpdateNIcons();
+			});
+		}
     }
 }
