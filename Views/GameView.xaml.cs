@@ -80,7 +80,7 @@ namespace Games_Launcher.Views
                     MessageBox.Show($"No se pudo iniciar el juego. Verifica que la ruta y los parámetros sean correctos.\n\nError: {e.Message} ({e.HResult})", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-            else if (thisGame.IsRunning && App.window.IsVisible)
+            else if (thisGame.IsRunning)
                 foreach (var process in Process.GetProcessesByName(thisGame.ProcessName))
                     process.Kill();
 
@@ -113,7 +113,6 @@ namespace Games_Launcher.Views
 				BTNJugar.Foreground = Brushes.White;
 				BTNJugar.Tag = FindResource("JugarColorNormal");
 				BTNJugar.BorderBrush = (Brush)FindResource("JugarColorMouseOver");
-				LBLTimeOppend.Content = GameFunctions.ConvertTime(thisGame.PlayTime);
 			});
 		}
 
@@ -127,7 +126,6 @@ namespace Games_Launcher.Views
 				BTNJugar.Foreground = Brushes.White;
 				BTNJugar.Tag = FindResource("DownloadColorNormal");
 				BTNJugar.BorderBrush = (Brush)FindResource("DownloadColorMouseOver");
-				LBLLastOppend.Content = GameFunctions.UltimaVezJugado(thisGame.LastPlayed);
 				App.UpdateNIcons();
 			});
 		}

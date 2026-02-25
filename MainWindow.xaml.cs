@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Games_Launcher.Core;
 using System.Windows;
 using System.Windows.Input;
 
@@ -9,7 +9,6 @@ namespace Games_Launcher
     /// </summary>
     public partial class MainWindow : Window
     {
-        public event Action CloseEvent;
         public MainWindow()
         {
             InitializeComponent();
@@ -23,10 +22,9 @@ namespace Games_Launcher
         }
         private void b_cerrar_Click(object sender, RoutedEventArgs e)
         {
-            InvokeEvent();
+            GameMonitor.StopLoop();
             Close();
         }
-        public void InvokeEvent() => CloseEvent?.Invoke();
 
         private void b_minimizar_Click(object sender, RoutedEventArgs e)
         {

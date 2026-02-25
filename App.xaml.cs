@@ -13,7 +13,7 @@ namespace Games_Launcher
     /// </summary>
     public partial class App : Application
     {
-        public static MainWindow window;
+		public static MainWindow window;
         private bool EnableAutoSave = false;
 
         private SingleInstanceManager _instance;
@@ -44,9 +44,9 @@ namespace Games_Launcher
         public static void Hide() { _windowController.Hide(); _notifyIcon.ShowNIcon(); }
 
         private void Current_Exit(object sender, ExitEventArgs e)
-        {
-            window.InvokeEvent();
-            GamesInfo.SaveGamesData();
+		{
+			GameMonitor.StopLoop();
+			GamesInfo.SaveGamesData();
             _notifyIcon.Dispose();
         }
         public static void UpdateNIcons() => _notifyIcon.UpdateNICons();

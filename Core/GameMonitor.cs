@@ -50,11 +50,9 @@ namespace Games_Launcher.Core
                     await Task.Delay(3000);
                 }
             });
-
-            App.window.CloseEvent += CloseEvent;
         }
 
-        private static void CloseEvent()
+        public static void StopLoop()
         {
             if (runingGames.Count > 0)
             {

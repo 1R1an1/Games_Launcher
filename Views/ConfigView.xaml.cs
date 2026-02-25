@@ -1,10 +1,4 @@
 ﻿using Games_Launcher.Core;
-using IWshRuntimeLibrary;
-using Microsoft.Win32;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -15,9 +9,6 @@ namespace Games_Launcher.Views
 	/// </summary>
 	public partial class ConfigView : UserControl
 	{
-		private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
-		private const string ValueName = "Games Launcher";
-
 		private bool _isLoading;
 
 		public ConfigView()
