@@ -38,6 +38,9 @@
   <PropertyGroup>
     <ApplicationIcon>Img\icon.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="CustomMarshalers" />
     <Reference Include="FortiCryptBC">
@@ -82,6 +85,7 @@
     <Compile Include="Core\FD\FileDownloaderUI.cs" />
     <Compile Include="Core\FD\FileDownloaderUtils.cs" />
     <Compile Include="Core\FD\IFileDownloaderView.cs" />
+    <Compile Include="Core\GameController.cs" />
     <Compile Include="Core\GameFunctions.cs" />
     <Compile Include="Core\GameMonitor.cs" />
     <Compile Include="Core\GamesInfo.cs" />

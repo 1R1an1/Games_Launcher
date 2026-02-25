@@ -3,8 +3,6 @@ using Games_Launcher.Model;
 using Games_Launcher.Windows;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -18,6 +16,7 @@ namespace Games_Launcher.Views
     {
 		public GameModel thisGame => (GameModel)DataContext;
 		public GameViewModel _viewModel { get; set; }
+        private GameController _game;
 
 		public GameView()
         {
@@ -35,6 +34,7 @@ namespace Games_Launcher.Views
 				{
                     _viewModel = new GameViewModel(newGame);
 					newGame.PropertyChanged += Game_PropertyChanged;
+                    _game = new GameController(newGame);
 
 					if (newGame.IsRunning)
 						ChangeToStopBTN();
@@ -58,19 +58,13 @@ namespace Games_Launcher.Views
 			}
 		}
 
-		public void BTNJugar_Click(object sender = null, RoutedEventArgs ea = null)
+		private void BTNJugar_Click(object sender = null, RoutedEventArgs ea = null)
         {
             if (!thisGame.IsRunning)
             {
                 try
                 {
-                    Process.Start(new ProcessStartInfo()
-                    {
-                        FileName = thisGame.Path,
-                        Arguments = thisGame.Parameters,
-                        UseShellExecute = false,
-                        WorkingDirectory = Path.GetDirectoryName(thisGame.Path),
-                    });
+                    _game.StartGame();
                     BTNJugar.IsEnabled = false;
                     BTNJugar.Tag = (Brush)FindResource("NormalColorNormal2");
                     BTNJugar.Foreground = (Brush)FindResource("FontColorDisabled2");
@@ -81,10 +75,7 @@ namespace Games_Launcher.Views
                 }
             }
             else if (thisGame.IsRunning)
-                foreach (var process in Process.GetProcessesByName(thisGame.ProcessName))
-                    process.Kill();
-
-
+                _game.StopGame();
         }
         private void BTNEliminar_Click(object sender, RoutedEventArgs e)
         {

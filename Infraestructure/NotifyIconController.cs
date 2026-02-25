@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using W = System.Windows;
 using System.Windows.Forms;
 
 namespace Games_Launcher.Infraestructure
@@ -42,14 +43,12 @@ namespace Games_Launcher.Infraestructure
 			var menu = new ContextMenuStrip();
 			foreach (var item in GamesInfo.Games.OrderByDescending(x => x.LastPlayed).Take(5).ToList())
 			{
-				menu.Items.Add(item.Name, GameFunctions.Try(() => Icon.ExtractAssociatedIcon(item.Path)?.ToBitmap()) ?? new Bitmap(App.GetResourceStream(new Uri("pack://application:,,,/Img/ErrorImg.png")).Stream),
+				menu.Items.Add(
+					item.Name,
+					GameFunctions.Try(() => Icon.ExtractAssociatedIcon(item.Path)?.ToBitmap()) ?? new Bitmap(App.GetResourceStream(new Uri("pack://application:,,,/Img/ErrorImg.png")).Stream),
 					(s, e) =>
 					{
-						var gameView = GameFunctions.GetGameViewFromItem(App.window.CDU_Window.GamesItemsControl, item);
-						if (gameView != null)
-						{
-							gameView.BTNJugar_Click();
-						}
+						try { GameController.StartGame(item); } catch (Exception ex) { W.MessageBox.Show($"No se pudo iniciar el juego. Verifica que la ruta y los parámetros sean correctos.\n\nError: {ex.Message} ({ex.HResult})", "Error", W.MessageBoxButton.OK, W.MessageBoxImage.Error); }
 					}
 				);
 			}
