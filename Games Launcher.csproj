@@ -90,6 +90,7 @@
     <Compile Include="Infraestructure\WindowController.cs" />
     <Compile Include="Model\AppModel.cs" />
     <Compile Include="Model\GameViewModel.cs" />
+    <Compile Include="Model\ObservableObject.cs" />
     <Compile Include="Views\ConfigView.xaml.cs">
       <DependentUpon>ConfigView.xaml</DependentUpon>
     </Compile>
