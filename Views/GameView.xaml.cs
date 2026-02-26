@@ -117,7 +117,6 @@ namespace Games_Launcher.Views
 				BTNJugar.Foreground = Brushes.White;
 				BTNJugar.Tag = FindResource("DownloadColorNormal");
 				BTNJugar.BorderBrush = (Brush)FindResource("DownloadColorMouseOver");
-				App.UpdateNIcons();
 			});
 		}
     }

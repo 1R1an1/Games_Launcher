@@ -13,7 +13,7 @@ namespace Games_Launcher
     /// </summary>
     public partial class App : Application
     {
-		public static MainWindow window;
+		private static MainWindow window;
         private bool EnableAutoSave = false;
 
         private SingleInstanceManager _instance;
@@ -22,14 +22,13 @@ namespace Games_Launcher
 
         protected override void OnStartup(StartupEventArgs e)
         {
-
 			if (!InitializeSingleInstance())
 				return;
 
 			base.OnStartup(e);
 
 			InitializeCore();
-			InitializeWindow();
+			//InitializeWindow();
 			InitializeTray();
 			HandleStartupArgs(e.Args);
 
@@ -40,7 +39,17 @@ namespace Games_Launcher
 			StartAutoSave();
 		}
 
-        public static void Show() { _windowController.Show(); _notifyIcon.HideNIcon(); }
+		public static void Show()
+		{
+			Current.Dispatcher.Invoke(() =>
+			{
+				if (window == null)
+					InitializeWindow();
+
+				_windowController.Show();
+				_notifyIcon.HideNIcon();
+			});
+		}
         public static void Hide() { _windowController.Hide(); _notifyIcon.ShowNIcon(); }
 
         private void Current_Exit(object sender, ExitEventArgs e)
@@ -49,8 +58,6 @@ namespace Games_Launcher
 			GamesInfo.SaveGamesData();
             _notifyIcon.Dispose();
         }
-        public static void UpdateNIcons() => _notifyIcon.UpdateNICons();
-
 
 		private bool InitializeSingleInstance()
 		{
@@ -72,7 +79,7 @@ namespace Games_Launcher
 			GamesInfo.LoadGamesData();
 		}
 
-		private void InitializeWindow()
+		private static void InitializeWindow()
 		{
 			window = new MainWindow();
 			_windowController = new WindowController(window);
@@ -87,19 +94,12 @@ namespace Games_Launcher
 
 		private void HandleStartupArgs(string[] args)
 		{
-			window.ShowInTaskbar = false;
-			window.Show();
-
 			if (args.Any(a => a.Equals("-background", StringComparison.OrdinalIgnoreCase)))
-			{
-				Hide();
 				_notifyIcon.ShowNIcon();
-			}
+			
 			else
-			{
-				window.ShowInTaskbar = true;
-				_notifyIcon.HideNIcon();
-			}
+				Show();
+			
 		}
 
 		private void StartAutoSave()

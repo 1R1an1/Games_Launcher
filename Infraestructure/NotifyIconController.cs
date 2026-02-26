@@ -1,11 +1,12 @@
 ﻿using Games_Launcher.Core;
+using Games_Launcher.Model;
 using Games_Launcher.Windows;
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using W = System.Windows;
 using System.Windows.Forms;
+using W = System.Windows;
 
 namespace Games_Launcher.Infraestructure
 {
@@ -25,9 +26,32 @@ namespace Games_Launcher.Infraestructure
 				Visible = false
 			};
 
+			// Suscribirse a los juegos existentes
+			foreach (var game in GamesInfo.Games)
+				game.PropertyChanged += Game_PropertyChanged;
+
+			// Si la lista cambia (se agrega o quita un juego)
+			GamesInfo.Games.CollectionChanged += (s, e) =>
+			{
+				if (e.NewItems != null)
+					foreach (GameModel g in e.NewItems)
+						g.PropertyChanged += Game_PropertyChanged;
+
+				if (e.OldItems != null)
+					foreach (GameModel g in e.OldItems)
+						g.PropertyChanged -= Game_PropertyChanged;
+
+				UpdateNICons();
+			};
+
 			UpdateNICons();
-			
 			_icon.DoubleClick += (s, e) => ShowRequested?.Invoke();
+		}
+
+		private void Game_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+		{
+			if (e.PropertyName == nameof(GameModel.LastPlayed) || e.PropertyName == nameof(GameModel.Name)|| e.PropertyName == nameof(GameModel.Path))
+				UpdateNICons();
 		}
 
 		public void Dispose()
