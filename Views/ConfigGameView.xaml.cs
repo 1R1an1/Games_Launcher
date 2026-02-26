@@ -34,9 +34,9 @@ namespace Games_Launcher.Views
                 MessageBox.Show("La ruta del juego no es válida.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            _thisGame.Parameters = GameParametersTBX.Text;
-            _thisGame.Name = GameNameTBX.Text;
-            _thisGame.Path = GamePathTBX.Text;
+            _thisGame._game.Parameters = GameParametersTBX.Text;
+            _thisGame._game.Name = GameNameTBX.Text;
+            _thisGame._game.Path = GamePathTBX.Text;
             _thisGame._game.ProcessName = Path.GetFileNameWithoutExtension(GamePathTBX.Text);
             Window.GetWindow(this).Close();
         }
@@ -47,12 +47,12 @@ namespace Games_Launcher.Views
         }
         private void OpenGamePathBTN_Click(object sender, RoutedEventArgs e)
         {
-            if (!Directory.Exists(Path.GetDirectoryName(_thisGame.Path)))
+            if (!Directory.Exists(Path.GetDirectoryName(_thisGame._game.Path)))
             {
                 MessageBox.Show("La carpeta del juego no fue encontrada", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
-            Process.Start("explorer.exe", Path.GetDirectoryName(_thisGame.Path));
+            Process.Start("explorer.exe", Path.GetDirectoryName(_thisGame._game.Path));
         }
 
 		private async void MoverBTN_Click(object sender, RoutedEventArgs e)

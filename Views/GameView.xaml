@@ -38,7 +38,7 @@
                                TextWrapping="Wrap" 
                                HorizontalAlignment="Left"
 							   d:Text="GAMETITLE"
-                               Text="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=_viewModel.Name}"/>
+                               Text="{Binding Name}"/>
                     
                     <StackPanel Orientation="Vertical"
                                 VerticalAlignment="Top"

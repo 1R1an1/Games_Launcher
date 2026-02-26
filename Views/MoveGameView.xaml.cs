@@ -29,7 +29,7 @@ namespace Games_Launcher.Views
 			DataContextChanged += (_, __) =>
 			{
 				MovePathTBX.ToolTip = "Selecciona la carpeta destino donde quieres mover el juego.\r\n\r\nEjemplos:\r\n\r\n- Si seleccionas:\r\n  C:\\Juegos\r\n  → El juego quedará en:\r\n  C:\\Juegos\\{GameFolderName}\r\n\r\n- Si seleccionas:\r\n  C:\\Juegos\\{GameFolderName}\r\n  → El juego quedará en:\r\n  C:\\Juegos\\{GameFolderName}\r\n  (No se creará otra carpeta {GameFolderName} dentro)\r\n\r\nSolo selecciona la carpeta donde quieres que esté el juego.";
-				RootPathTBX.Text = ObtenerCarpetaMasParecida(thisGame.Path);
+				RootPathTBX.Text = ObtenerCarpetaMasParecida(thisGame._game.Path);
 			};
 		}
 
@@ -40,7 +40,7 @@ namespace Games_Launcher.Views
 
 			if (!Directory.Exists(RootPathTBX.Text) ||
 				!Directory.Exists(MovePathTBX.Text) ||
-				!EsRutaValidaParaSeleccion(Path.GetDirectoryName(thisGame.Path), RootPathTBX.Text) ||
+				!EsRutaValidaParaSeleccion(Path.GetDirectoryName(thisGame._game.Path), RootPathTBX.Text) ||
 				rootPath.Equals(movePath, StringComparison.OrdinalIgnoreCase) ||
 				rootPath.StartsWith(movePath + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
 			{
@@ -93,7 +93,7 @@ namespace Games_Launcher.Views
 
 			try
 			{
-			    thisGame.Path = Path.Combine(await Task.Run(() => MoverJuego(rootPath, movePath, progreso)), Path.GetFileName(thisGame.Path));
+			    thisGame._game.Path = Path.Combine(await Task.Run(() => MoverJuego(rootPath, movePath, progreso)), Path.GetFileName(thisGame._game.Path));
 
 				MessageBox.Show(Window.GetWindow(this), "El juego se movió correctamente.");
 				IsMoving = false;
@@ -191,12 +191,12 @@ namespace Games_Launcher.Views
 		{
 			CommonOpenFileDialog dialog = new CommonOpenFileDialog();
 			dialog.IsFolderPicker = true;
-			dialog.InitialDirectory = ObtenerCarpetaMasParecida(thisGame.Path);
+			dialog.InitialDirectory = ObtenerCarpetaMasParecida(thisGame._game.Path);
 			dialog.Title = "Selecciona la carpeta raiz del juego";
 
 			if (dialog.ShowDialog() == CommonFileDialogResult.Ok && Directory.Exists(dialog.FileName))
 			{
-				if (EsRutaValidaParaSeleccion(Path.GetDirectoryName(thisGame.Path), dialog.FileName))
+				if (EsRutaValidaParaSeleccion(Path.GetDirectoryName(thisGame._game.Path), dialog.FileName))
 				{
 					RootPathTBX.Text = dialog.FileName;
 				}

@@ -18,11 +18,11 @@
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
             <StackPanel Margin="0,10" HorizontalAlignment="Center">
                 <Label HorizontalAlignment="Left" FontSize="17" Style="{StaticResource lblSNTNBG}" Content="Nombre del juego:" ToolTip="Es el nombre que se va a mostrar del juego"/>
-                <TextBox x:Name="GameNameTBX" FontSize="17" Style="{StaticResource TBX}" MinWidth="350" Text="{Binding Name}"/>
+				<TextBox x:Name="GameNameTBX" FontSize="17" Style="{StaticResource TBX}" MinWidth="350" Text="{Binding _game.Name, Mode=OneWay}"/>
             </StackPanel>
             <StackPanel Margin="0,10" HorizontalAlignment="Center">
                 <Label HorizontalAlignment="Left" FontSize="17" Style="{StaticResource lblSNTNBG}" Content="Parametros del juego:" ToolTip="Son los argumentos que se le va a dar cuando se inicie el juego"/>
-                <TextBox x:Name="GameParametersTBX" FontSize="17" Style="{StaticResource TBX}" MinWidth="350" Text="{Binding Parameters}"/>
+				<TextBox x:Name="GameParametersTBX" FontSize="17" Style="{StaticResource TBX}" MinWidth="350" Text="{Binding _game.Parameters, Mode=OneWay}"/>
             </StackPanel>
             <StackPanel Margin="0,10">
                 <Label HorizontalAlignment="Left" FontSize="17" Style="{StaticResource lblSNTNBG}" Content="Ruta del juego:" ToolTip="Es la ruta con la que se va a abrir el juego"/>
@@ -34,7 +34,7 @@
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="1" ToolTip="Seleccionar archivo del juego" HorizontalAlignment="Right" Padding="0" FontSize="15" Height="26" Width="26" x:Name="SelectGamePathBTN" Style="{StaticResource ButtonStyle}" Content="📁" Margin="0,0,0,0" Click="SelectGamePathBTN_Click"/>
                     <Button Grid.Column="2" ToolTip="Abrir carpeta del juegp" HorizontalAlignment="Right" Padding="0" FontSize="15" Height="26" Width="26" x:Name="OpenGamePathBTN" Style="{StaticResource ButtonStyle}" Content="👁" Margin="0,0,0,0" Click="OpenGamePathBTN_Click"/>
-                    <TextBox x:Name="GamePathTBX" FontSize="17" Style="{StaticResource TBX}" MinWidth="298" Text="{Binding Path}" TextChanged="GamePathTBX_TextChanged"/>
+					<TextBox x:Name="GamePathTBX" FontSize="17" Style="{StaticResource TBX}" MinWidth="298" Text="{Binding _game.Path, Mode=OneWay}" TextChanged="GamePathTBX_TextChanged"/>
                 </Grid>
             </StackPanel>
         </StackPanel>
