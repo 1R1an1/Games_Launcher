@@ -23,7 +23,6 @@ namespace Games_Launcher.Core
                 {
                     GameModel[] currentGames;
 
-                    // Evitamos modificar la lista mientras se recorre
                     lock (_lock)
                     {
                         currentGames = GamesInfo.Games.ToArray();
@@ -47,7 +46,7 @@ namespace Games_Launcher.Core
                             game.PlayTime += DateTime.Now - game.LastPlayed;
                         }
                     }
-                    await Task.Delay(3000);
+                    await Task.Delay(3000).ConfigureAwait(false);
                 }
             });
         }
