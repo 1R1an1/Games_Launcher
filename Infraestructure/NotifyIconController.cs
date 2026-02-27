@@ -45,7 +45,7 @@ namespace Games_Launcher.Infraestructure
 			};
 
 			UpdateNICons();
-			_icon.DoubleClick += (s, e) => ShowRequested?.Invoke();
+			_icon.MouseClick += (s, e) => { if (e.Button == MouseButtons.Left) ShowRequested?.Invoke(); };
 		}
 
 		private void Game_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
