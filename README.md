@@ -52,8 +52,7 @@ Para errores o sugerencias, abre un *[Issue](https://github.com/1R1an1/Games_Lau
 3. Compilar en modo Release o Debug
 4. Ejecutar
 
-<!-- COMENTARIO
-## 🧠 Objetivo del proyecto
+---
 
-Crear un launcher ligero, personalizable y modular que permita centralizar la gestión de juegos sin depender de plataformas externas.
--->
+## 📄 Licencia
+Este proyecto está bajo la licencia **Mozilla Public License 2.0 (MPL-2.0)**.
